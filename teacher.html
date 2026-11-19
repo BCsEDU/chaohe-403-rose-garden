@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+  <title>教師後台與成果展示｜403 正方形玫瑰花圃（百格紙）</title>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --primary: #1e40af;
+      --primary-dark: #1e3a8a;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #cbd5e1;
+      --ok: #16a34a;
+      --warn: #d97706;
+      --bad: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 56px;
+    }
+
+    header {
+      background: #1e3a8a;
+      color: #fff;
+      padding: 12px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: #fbbf24;
+      color: #1e3a8a;
+      font-weight: 900;
+      padding: 3px 12px;
+      border-radius: 999px;
+      font-size: 13.5px;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .hdr-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.13);
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      font-weight: 800;
+      text-decoration: none;
+      font-size: 14px;
+      padding: 7px 13px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.24);
+    }
+
+    main {
+      max-width: 1460px;
+      margin: 18px auto;
+      padding: 0 18px;
+    }
+
+    /* 登入卡片 */
+    .login-box {
+      max-width: 460px;
+      margin: 64px auto;
+      background: #fff;
+      border-radius: 22px;
+      padding: 32px 28px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
+      border: 2px solid var(--border);
+      text-align: center;
+    }
+    .login-box h2 {
+      font-size: 26px;
+      color: var(--primary-dark);
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+    .login-box p {
+      color: var(--muted);
+      font-size: 15.5px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .input-pw {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      font-size: 19px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      text-align: center;
+      outline: none;
+    }
+    .input-pw:focus {
+      border-color: #2563eb;
+    }
+    .btn-login {
+      width: 100%;
+      padding: 13px;
+      border-radius: 14px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      border: none;
+      cursor: pointer;
+    }
+    .err-msg {
+      color: var(--bad);
+      font-size: 15px;
+      font-weight: 800;
+      margin-top: 12px;
+      min-height: 22px;
+    }
+
+    .panel {
+      background: #fff;
+      border-radius: 18px;
+      padding: 16px 20px;
+      border: 2px solid var(--border);
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+      margin-bottom: 16px;
+    }
+
+    .setup-alert {
+      background: #fff7ed;
+      border: 2px solid #fdba74;
+      color: #9a3412;
+      border-radius: 16px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      font-weight: 800;
+      display: none;
+    }
+    .setup-alert.show {
+      display: block;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .kpi {
+      background: #fff;
+      border-radius: 18px;
+      padding: 15px 18px;
+      border: 2px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .kpi-lbl {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--muted);
+    }
+    .kpi-val {
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--primary-dark);
+      line-height: 1.15;
+    }
+    .kpi-sub {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #475569;
+    }
+    .kpi-bar {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+    .kpi-bar > div {
+      height: 100%;
+      background: #2563eb;
+      border-radius: 99px;
+      transition: width 0.3s;
+    }
+
+    .sec-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--primary-dark);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* 1~29 號組隊狀態列 */
+    .seat-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .seat-chip {
+      min-width: 58px;
+      padding: 5px 8px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 900;
+      text-align: center;
+      border: 1.5px dashed #cbd5e1;
+      background: #f8fafc;
+      color: #94a3b8;
+    }
+    .seat-chip.doing {
+      border-style: solid;
+      border-color: #60a5fa;
+      background: #eff6ff;
+      color: #1d4ed8;
+      cursor: pointer;
+    }
+    .seat-chip.done {
+      border-style: solid;
+      border-color: #4ade80;
+      background: #dcfce7;
+      color: #166534;
+      cursor: pointer;
+    }
+
+    /* 工具列 */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-act {
+      padding: 8px 13px;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .btn-act:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+    .btn-act.primary {
+      background: #2563eb;
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .btn-act.active {
+      background: #dcfce7;
+      color: #166534;
+      border-color: #86efac;
+    }
+    .btn-act.warn-on {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #fcd34d;
+    }
+    .btn-act.danger {
+      background: #fef2f2;
+      color: #b91c1c;
+      border-color: #fca5a5;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .tab {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 2px solid var(--border);
+      background: #f8fafc;
+      color: #334155;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .tab.on {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary-dark);
+    }
+
+    /* 15 組作品卡片牆 */
+    .groups-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+      gap: 14px;
+    }
+    .gcard {
+      border: 2.5px solid #cbd5e1;
+      border-radius: 18px;
+      padding: 12px 14px;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      transition: transform 0.12s, box-shadow 0.15s;
+    }
+    .gcard:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+    .gcard.done {
+      background: #f0fdf4;
+      border-color: #4ade80;
+    }
+    .gcard.doing {
+      background: #eff6ff;
+      border-color: #60a5fa;
+    }
+    .gcard.featured {
+      box-shadow: 0 0 0 3px #facc15;
+    }
+
+    .gcard-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .gcard-title {
+      font-size: 16.5px;
+      font-weight: 900;
+      color: var(--primary-dark);
+    }
+    .gcard-badge {
+      font-size: 12px;
+      font-weight: 900;
+      padding: 2px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .gb-done {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .gb-doing {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .gcard-sub {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #9d174d;
+      min-height: 20px;
+    }
+
+    .mini-svg-wrap {
+      background: #fff;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+    }
+    .mini-svg-wrap svg {
+      width: 100%;
+      max-width: 210px;
+      aspect-ratio: 1 / 1;
+      display: block;
+    }
+
+    .cnt-pills {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 4px;
+    }
+    .cnt-pill {
+      font-size: 11.5px;
+      font-weight: 900;
+      text-align: center;
+      padding: 3px 2px;
+      border-radius: 7px;
+      background: #fff;
+      border: 1.5px solid #cbd5e1;
+      color: #475569;
+    }
+    .cnt-pill.ok {
+      border-color: #22c55e;
+      background: #dcfce7;
+      color: #166534;
+    }
+    .cnt-pill.bad {
+      border-color: #f87171;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .mis-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      min-height: 20px;
+    }
+    .mis-tag {
+      font-size: 11.5px;
+      font-weight: 800;
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 1px 7px;
+      border-radius: 999px;
+    }
+
+    .gcard-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding-top: 4px;
+      border-top: 1.5px dashed #cbd5e1;
+    }
+    .chk-compare {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #334155;
+      cursor: pointer;
+    }
+    .star-btn {
+      padding: 5px 8px;
+      border-radius: 8px;
+      border: 1.5px solid #cbd5e1;
+      background: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .star-btn.on {
+      background: #fef08a;
+      border-color: #eab308;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    /* 大螢幕展示模式 & 並排對比 Modal */
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.72);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+    .modal-mask.show {
+      display: flex;
+    }
+
+    .showcase-box {
+      background: #fff;
+      border-radius: 24px;
+      width: min(96vw, 1280px);
+      height: min(94dvh, 900px);
+      padding: 16px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    .showcase-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .showcase-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .showcase-body {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: 18px;
+      align-items: center;
+    }
+    .showcase-svg-stage {
+      height: 100%;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: 20px;
+      padding: 14px;
+    }
+    .showcase-svg-stage svg {
+      height: 100%;
+      width: 100%;
+      max-height: 100%;
+      max-width: 100%;
+      display: block;
+    }
+
+    .showcase-side {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .iso-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: 16px;
+      padding: 12px;
+    }
+    .iso-group h4 {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--primary-dark);
+    }
+    .iso-btn {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 11px;
+      border: 2px solid #cbd5e1;
+      background: #fff;
+      font-size: 14.5px;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .iso-btn.on {
+      border-color: var(--primary);
+      background: #eff6ff;
+      color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    .reveal-box {
+      background: #f0fdf4;
+      border: 2px solid #86efac;
+      border-radius: 16px;
+      padding: 12px;
+      font-size: 14.5px;
+      font-weight: 800;
+      color: #166534;
+      line-height: 1.7;
+    }
+    .reveal-box.hidden-math {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: #64748b;
+      text-align: center;
+    }
+
+    .compare-grid {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      padding: 4px;
+      align-items: start;
+    }
+    .cmp-card {
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: 18px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .cmp-card svg {
+      width: 100%;
+      max-width: min(320px, 46dvh);
+      aspect-ratio: 1 / 1;
+      display: block;
+    }
+
+    .mbox {
+      background: #fff;
+      border-radius: 22px;
+      padding: 22px 26px;
+      max-width: 500px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    @media (max-width: 920px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .showcase-body {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(260px, 1fr) auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="badge">403 數學課堂</span>
+      <span class="title">🌹 正方形玫瑰花圃（百格紙）教師後台與展示系統</span>
+    </div>
+    <div class="hdr-actions">
+      <button type="button" class="nav-btn" id="btnShowQr">📱 學生登入 QR Code</button>
+      <a href="index.html" class="nav-btn" target="_blank" rel="noopener">📝 開啟學生操作頁</a>
+      <button type="button" class="nav-btn" id="btnLogout" style="display: none">登出</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- 教師登入區 -->
+    <section id="sec-login" class="login-box">
+      <h2>教師身分驗證</h2>
+      <p>請輸入班級後台教師密碼，即可即時查看 15 組進度、診斷迷思並於大螢幕展示學生作品。</p>
+      <form id="loginForm">
+        <input type="password" id="inputPw" class="input-pw" placeholder="請輸入教師密碼" required autofocus />
+        <button type="submit" id="btnLoginSubmit" class="btn-login">登入教師後台</button>
+      </form>
+      <div class="err-msg" id="loginErr"></div>
+    </section>
+
+    <!-- 儀表板 -->
+    <section id="sec-dashboard" style="display: none">
+      <div class="setup-alert" id="setupAlert"></div>
+
+      <div class="kpi-grid" id="kpiGrid"></div>
+
+      <div class="panel">
+        <div class="sec-title">
+          <span>🪑 全班 1～29 號組隊覆蓋檢查（點選座號可直接開啟該組展示）</span>
+          <span id="seatCoverageNote" style="font-size: 13.5px; color: #475569"></span>
+        </div>
+        <div class="seat-strip" id="seatStrip"></div>
+      </div>
+
+      <div class="panel">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <button type="button" class="btn-act primary" id="btnRefresh">🔄 立即更新</button>
+            <button type="button" class="btn-act active" id="btnAuto">⏱ 自動更新：開（每 3 秒）</button>
+            <button type="button" class="btn-act active" id="btnPreviewMode">🌹 玫瑰花預覽：開</button>
+            <button type="button" class="btn-act" id="btnAnonMode">🙈 匿名展示：關</button>
+            <span id="lastUpdateTxt" style="font-size: 13px; font-weight: 800; color: #64748b"></span>
+          </div>
+          <div class="toolbar-right">
+            <button type="button" class="btn-act primary" id="btnOpenCompare">🏆 並排對比展示 (0)</button>
+            <button type="button" class="btn-act" id="btnExportCsv">📥 匯出 CSV</button>
+            <button type="button" class="btn-act danger" id="btnResetAll">🗑️ 清空全班組別</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="sec-title">
+          <span>🖼️ 15 組即時百格紙作品牆（點選作品即可大螢幕投影展示）</span>
+        </div>
+        <div class="tabs" id="filterTabs"></div>
+        <div class="groups-grid" id="groupsGrid"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 單組大螢幕展示模式 -->
+  <div class="modal-mask" id="showcaseModal">
+    <div class="showcase-box">
+      <div class="showcase-hdr">
+        <div class="showcase-title" id="scTitle">作品展示</div>
+        <div style="display: flex; gap: 7px; flex-wrap: wrap; align-items: center">
+          <button type="button" class="btn-act" id="scPrevBtn">◀ 上一組</button>
+          <button type="button" class="btn-act" id="scNextBtn">下一組 ▶</button>
+          <button type="button" class="btn-act active" id="scRoseBtn">🌹 玫瑰花模式</button>
+          <button type="button" class="btn-act" id="scAnonBtn">🙈 隱藏座號</button>
+          <button type="button" class="btn-act active" id="scMathBtn">🔢 顯示格數</button>
+          <button type="button" class="btn-act" id="scNumBtn">①② 格子編號：關</button>
+          <button type="button" class="btn-act" id="scStarBtn">⭐ 精選</button>
+          <button type="button" class="btn-act primary" id="scCloseBtn">✕ 關閉</button>
+        </div>
+      </div>
+
+      <div class="showcase-body">
+        <div class="showcase-svg-stage" id="scSvgStage"></div>
+        <div class="showcase-side">
+          <div class="iso-group">
+            <h4>✨ 投影聚焦檢查（點選單一顏色讓全班一起點數）</h4>
+            <button type="button" class="iso-btn on" data-iso="ALL"><span>🌈 顯示全部顏色</span><span>100 格</span></button>
+            <button type="button" class="iso-btn" data-iso="G"><span>🩶 只看灰玫瑰（0.25）</span><span id="scCntG"></span></button>
+            <button type="button" class="iso-btn" data-iso="R"><span>🌹 只看紅玫瑰（0.5）</span><span id="scCntR"></span></button>
+            <button type="button" class="iso-btn" data-iso="B"><span>💙 只看藍玫瑰（0.05）</span><span id="scCntB"></span></button>
+            <button type="button" class="iso-btn" data-iso="W"><span>🤍 只看白玫瑰（0.20）</span><span id="scCntW"></span></button>
+          </div>
+
+          <div class="reveal-box" id="scRevealBox"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 多組並排對比展示模式 -->
+  <div class="modal-mask" id="compareModal">
+    <div class="showcase-box">
+      <div class="showcase-hdr">
+        <div class="showcase-title">🏆 多組百格紙創意對比展示（一樣的數學小數，不一樣的設計！）</div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap">
+          <button type="button" class="btn-act active" id="cmpRoseBtn">🌹 玫瑰花模式</button>
+          <button type="button" class="btn-act" id="cmpAnonBtn">🙈 隱藏座號</button>
+          <button type="button" class="btn-act active" id="cmpMathBtn">🔢 顯示格數</button>
+          <button type="button" class="btn-act primary" id="cmpCloseBtn">✕ 關閉</button>
+        </div>
+      </div>
+      <div class="compare-grid" id="compareGrid"></div>
+    </div>
+  </div>
+
+  <!-- QR Code 彈窗 -->
+  <div class="modal-mask" id="qrModal">
+    <div class="mbox" style="align-items: center; text-align: center">
+      <h3 style="font-size: 21px; font-weight: 900; color: var(--primary-dark)">📱 學生 iPad 掃碼登入（15 組同步）</h3>
+      <div style="background: #fff; border: 3px solid #bfdbfe; border-radius: 16px; padding: 10px; display: inline-flex">
+        <img
+          src="qrcode.png"
+          alt="學生作答頁 QR Code"
+          style="width: 280px; height: 280px; max-width: 70vw; display: block"
+          onerror="this.style.display='none'; document.getElementById('qrErrTxt').style.display='block';"
+        />
+        <div id="qrErrTxt" style="display: none; padding: 20px; font-weight: 800; color: #64748b">請提供下方網址給學生 iPad 開啟</div>
+      </div>
+      <div id="studentUrlTxt" style="font-size: 14px; font-weight: 800; color: var(--primary-dark); word-break: break-all"></div>
+      <button type="button" class="btn-act primary" id="btnQrClose">關閉視窗</button>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://ppdgubracsneozahujxl.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_4_8Lj3idSkZ0z74V4AIpRA_qqyEicMd";
+    const API_URL = `${SUPABASE_URL}/functions/v1/rose-garden-403`;
+    const PW_KEY = "rose_garden_403_teacher_pw";
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(() => {});
+    }
+
+    const MIS_LABELS = {
+      red_5_like_005: "紅玫瑰 0.5 誤塗 5 格",
+      blue_50_like_05: "藍玫瑰 0.05 誤塗 50 格",
+      gray_not_25: "灰玫瑰非 25 格",
+      red_not_50: "紅玫瑰非 50 格",
+      blue_not_5: "藍玫瑰非 5 格",
+      white_exceeds_20: "白玫瑰超過 20 格",
+      white_not_20: "白玫瑰非 20 格",
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) =>
+      String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+    const state = {
+      pw: "",
+      groups: [],
+      autoOn: true,
+      autoTimer: null,
+      isFetching: false,
+      lastGroupsSig: "",
+      lastOkTime: "",
+      filter: "all",
+      showRoses: true,
+      anonMode: false,
+      compareKeys: new Set(),
+      showcaseKey: null,
+      showcaseIso: "ALL",
+      showcaseShowMath: true,
+      showcaseShowNumbers: false,
+    };
+
+    async function apiCall(payload, timeoutMs = 7000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            apikey: SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const msg = data?.error || `HTTP ${res.status}`;
+          const err = new Error(msg);
+          err.status = res.status;
+          throw err;
+        }
+        return data;
+      } catch (err) {
+        if (err?.name === "AbortError") {
+          const tErr = new Error("連線逾時");
+          tErr.isTimeout = true;
+          throw tErr;
+        }
+        throw err;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    function countGrid(grid, isCompleted) {
+      let G = 0;
+      let R = 0;
+      let B = 0;
+      let W = 0;
+      let empty = 0;
+      for (let i = 0; i < 100; i++) {
+        const ch = grid[i] || ".";
+        if (ch === "G") G++;
+        else if (ch === "R") R++;
+        else if (ch === "B") B++;
+        else if (ch === "W") W++;
+        else empty++;
+      }
+      return { G, R, B, W, empty, whiteEff: isCompleted ? 20 : W, painted: G + R + B + W };
+    }
+
+    function groupDisplayName(g, idxFallback) {
+      if (state.anonMode) return `作品 #${g.group_no || idxFallback + 1}`;
+      const seatsTxt = (g.seats || []).map((s) => `${String(s).padStart(2, "0")}號`).join("・");
+      return `第 ${g.group_no} 組｜${seatsTxt}`;
+    }
+
+    function fmtTime(iso) {
+      if (!iso) return "—";
+      try {
+        return new Date(iso).toLocaleTimeString("zh-TW", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      } catch {
+        return "—";
+      }
+    }
+
+    /* ---- 繪製 Crisp 10x10 SVG 百格紙（支援玫瑰花、顏色聚焦與編號點數） ---- */
+    function buildGridSvg(group, opts = {}) {
+      const showRoses = opts.showRoses !== undefined ? opts.showRoses : state.showRoses;
+      const isolate = opts.isolate || "ALL";
+      const showNumbers = Boolean(opts.showNumbers);
+      const grid = group.grid || ".".repeat(100);
+      const completed = Boolean(group.is_completed);
+
+      const FILL = {
+        G: "#d1d5db",
+        R: "#f472b6",
+        B: "#38bdf8",
+        W: "#fffef7",
+        ".": "#ffffff",
+      };
+      const ROSE_OUTER = {
+        G: "#9ca3af",
+        R: "#ec4899",
+        B: "#0ea5e9",
+        W: "#ffffff",
+      };
+      const ROSE_STROKE = {
+        G: "#6b7280",
+        R: "#be185d",
+        B: "#0369a1",
+        W: "#94a3b8",
+      };
+
+      const cellSz = 30;
+      let cellsSvg = "";
+      let seq = 0;
+
+      for (let i = 0; i < 100; i++) {
+        const r = Math.floor(i / 10);
+        const c = i % 10;
+        const x = c * cellSz;
+        const y = r * cellSz;
+        const rawCh = grid[i] || ".";
+        const effCh = rawCh === "." && completed ? "W" : rawCh;
+
+        const isMatch = isolate === "ALL" || effCh === isolate;
+        const opacity = isMatch ? 1 : 0.14;
+
+        cellsSvg += `<g opacity="${opacity}">`;
+        cellsSvg += `<rect x="${x}" y="${y}" width="${cellSz}" height="${cellSz}" fill="${FILL[effCh] || "#ffffff"}" />`;
+
+        if (showRoses && effCh !== ".") {
+          const cx = x + 15;
+          const cy = y + 15;
+          const petalStroke = effCh === "W" ? "#94a3b8" : "#fff";
+          cellsSvg += `<circle cx="${cx}" cy="${cy}" r="10.2" fill="${ROSE_OUTER[effCh]}" stroke="${ROSE_STROKE[effCh]}" stroke-width="1.5" />`;
+          if (!showNumbers || isolate === "ALL") {
+            cellsSvg += `<path d="M${cx} ${cy - 5.5}c2.8 0 4.8 2 4.8 4.4S${cx + 2.8} ${cy + 3.4} ${cx} ${cy + 3.4}s-4.4-1.8-4.4-4 1.6-3.6 3.6-3.6c1.6 0 2.8 1 2.8 2.4s-1 2.2-2.1 2.2c-.9 0-1.5-.6-1.5-1.3" fill="none" stroke="${petalStroke}" stroke-width="1.6" stroke-linecap="round" />`;
+          }
+        }
+
+        if (showNumbers && isolate !== "ALL" && effCh === isolate) {
+          seq++;
+          const txtCol = effCh === "W" || effCh === "G" ? "#0f172a" : "#ffffff";
+          cellsSvg += `<text x="${x + 15}" y="${y + 19.5}" text-anchor="middle" font-size="12.5" font-weight="900" fill="${txtCol}">${seq}</text>`;
+        }
+
+        cellsSvg += `</g>`;
+      }
+
+      // 格線與 5x5 輔助線（填色後依然清楚分明）
+      let linesSvg = "";
+      for (let k = 1; k < 10; k++) {
+        const pos = k * cellSz;
+        const isMid = k === 5;
+        const sw = isMid ? 2.6 : 1.35;
+        const col = isMid ? "#0f172a" : "#475569";
+        linesSvg += `<line x1="${pos}" y1="0" x2="${pos}" y2="300" stroke="${col}" stroke-width="${sw}" />`;
+        linesSvg += `<line x1="0" y1="${pos}" x2="300" y2="${pos}" stroke="${col}" stroke-width="${sw}" />`;
+      }
+
+      return `<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+        ${cellsSvg}
+        ${linesSvg}
+        <rect x="1.6" y="1.6" width="296.8" height="296.8" fill="none" stroke="#0f172a" stroke-width="3.2" rx="4" />
+      </svg>`;
+    }
+
+    function renderKPIs() {
+      const list = state.groups;
+      const totalGroups = list.length;
+      const seatSet = new Set();
+      list.forEach((g) => (g.seats || []).forEach((s) => seatSet.add(s)));
+      const doneGroups = list.filter((g) => g.is_completed).length;
+      const doingGroups = totalGroups - doneGroups;
+      const misGroups = list.filter((g) => Array.isArray(g.misconceptions) && g.misconceptions.length > 0).length;
+      const red5Count = list.filter((g) => (g.misconceptions || []).includes("red_5_like_005")).length;
+
+      $("kpiGrid").innerHTML = `
+        <div class="kpi">
+          <div class="kpi-lbl">👥 目前已登入組數</div>
+          <div class="kpi-val">${totalGroups} <span style="font-size:16px;color:#64748b">/ 15 組</span></div>
+          <div class="kpi-sub">已登入學生：${seatSet.size} / 29 人</div>
+          <div class="kpi-bar"><div style="width:${Math.round((totalGroups / 15) * 100)}%"></div></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-lbl">✅ 已完成達標組數</div>
+          <div class="kpi-val" style="color:#15803d">${doneGroups} <span style="font-size:16px;color:#64748b">/ ${totalGroups || 15} 組</span></div>
+          <div class="kpi-sub">完成率 ${totalGroups ? Math.round((doneGroups / totalGroups) * 100) : 0}%</div>
+          <div class="kpi-bar"><div style="width:${totalGroups ? Math.round((doneGroups / totalGroups) * 100) : 0}%;background:#16a34a"></div></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-lbl">🎨 創作／調整進行中</div>
+          <div class="kpi-val" style="color:#0284c7">${doingGroups} <span style="font-size:16px;color:#64748b">組</span></div>
+          <div class="kpi-sub">精選展示作品：${list.filter((g) => g.is_featured).length} 組</div>
+          <div class="kpi-bar"><div style="width:${totalGroups ? Math.round((doingGroups / totalGroups) * 100) : 0}%;background:#0284c7"></div></div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-lbl">⚠️ 曾出現小數迷思</div>
+          <div class="kpi-val" style="color:#b45309">${misGroups} <span style="font-size:16px;color:#64748b">組</span></div>
+          <div class="kpi-sub">其中「0.5 誤當 5 格」：${red5Count} 組</div>
+          <div class="kpi-bar"><div style="width:${totalGroups ? Math.round((misGroups / totalGroups) * 100) : 0}%;background:#f59e0b"></div></div>
+        </div>`;
+    }
+
+    function renderSeatStrip() {
+      const seatToGroup = new Map();
+      state.groups.forEach((g) => (g.seats || []).forEach((s) => seatToGroup.set(Number(s), g)));
+
+      let missing = 0;
+      let html = "";
+      for (let s = 1; s <= 29; s++) {
+        const g = seatToGroup.get(s);
+        if (!g) {
+          missing++;
+          html += `<span class="seat-chip">${String(s).padStart(2, "0")} 未登</span>`;
+        } else {
+          const cls = g.is_completed ? "done" : "doing";
+          html += `<button type="button" class="seat-chip ${cls}" data-gkey="${esc(g.group_key)}" title="點選查看第 ${g.group_no} 組作品">${String(s).padStart(2, "0")} 組${g.group_no}</button>`;
+        }
+      }
+      $("seatStrip").innerHTML = html;
+      $("seatCoverageNote").textContent = missing === 0 ? "🎉 全班 29 號都已組隊登入！" : `尚未組隊座號：${missing} 位`;
+      $("seatStrip").querySelectorAll("[data-gkey]").forEach((btn) => {
+        btn.addEventListener("click", () => openShowcase(btn.dataset.gkey));
+      });
+    }
+
+    function renderGroups() {
+      const list = state.groups;
+      const counts = {
+        all: list.length,
+        done: list.filter((g) => g.is_completed).length,
+        doing: list.filter((g) => !g.is_completed).length,
+        mis: list.filter((g) => Array.isArray(g.misconceptions) && g.misconceptions.length > 0).length,
+        featured: list.filter((g) => g.is_featured).length,
+      };
+      const tabDefs = [
+        ["all", `全部組別 (${counts.all})`],
+        ["done", `✅ 已完成 (${counts.done})`],
+        ["doing", `🎨 作答中 (${counts.doing})`],
+        ["mis", `⚠️ 曾有迷思 (${counts.mis})`],
+        ["featured", `⭐ 精選作品 (${counts.featured})`],
+      ];
+      $("filterTabs").innerHTML = tabDefs
+        .map(([k, lbl]) => `<button type="button" class="tab ${state.filter === k ? "on" : ""}" data-flt="${k}">${lbl}</button>`)
+        .join("");
+      $("filterTabs").querySelectorAll("[data-flt]").forEach((b) => {
+        b.addEventListener("click", () => {
+          state.filter = b.dataset.flt;
+          renderGroups();
+        });
+      });
+
+      const filtered = list.filter((g) => {
+        if (state.filter === "done") return g.is_completed;
+        if (state.filter === "doing") return !g.is_completed;
+        if (state.filter === "mis") return Array.isArray(g.misconceptions) && g.misconceptions.length > 0;
+        if (state.filter === "featured") return g.is_featured;
+        return true;
+      });
+
+      $("btnOpenCompare").textContent = `🏆 並排對比展示 (${state.compareKeys.size})`;
+
+      if (filtered.length === 0) {
+        $("groupsGrid").innerHTML = `<div class="empty-state" style="grid-column:1/-1">目前沒有符合條件的組別資料，請學生掃碼並選擇組員座號開始作答。</div>`;
+        return;
+      }
+
+      $("groupsGrid").innerHTML = filtered
+        .map((g, idx) => {
+          const c = countGrid(g.grid || ".".repeat(100), g.is_completed);
+          const cardCls = `${g.is_completed ? "done" : "doing"} ${g.is_featured ? "featured" : ""}`;
+          const badge = g.is_completed
+            ? `<span class="gcard-badge gb-done">✅ 已達標</span>`
+            : `<span class="gcard-badge gb-doing">🎨 作答中 (${c.painted}/100)</span>`;
+
+          const pillCls = (val, target) => (val === target ? "ok" : g.wrong_attempts > 0 || val > target ? "bad" : "");
+          const misTags = (g.misconceptions || []).slice(0, 2).map((m) => `<span class="mis-tag">${esc(MIS_LABELS[m] || m)}</span>`).join("");
+          const checked = state.compareKeys.has(g.group_key) ? "checked" : "";
+
+          return `<div class="gcard ${cardCls}">
+            <div class="gcard-top">
+              <span class="gcard-title">${esc(groupDisplayName(g, idx))}</span>
+              ${badge}
+            </div>
+            <div class="gcard-sub">${g.title ? `「${esc(g.title)}」` : `<span style="color:#94a3b8;font-weight:700">更新：${fmtTime(g.updated_at)}</span>`}</div>
+            <div class="mini-svg-wrap" data-show="${esc(g.group_key)}" title="點擊進入大螢幕展示">
+              ${buildGridSvg(g)}
+            </div>
+            <div class="cnt-pills">
+              <div class="cnt-pill ${pillCls(c.G, 25)}">灰 ${c.G}/25</div>
+              <div class="cnt-pill ${pillCls(c.R, 50)}">紅 ${c.R}/50</div>
+              <div class="cnt-pill ${pillCls(c.B, 5)}">藍 ${c.B}/5</div>
+              <div class="cnt-pill ${g.is_completed ? "ok" : ""}">白 ${c.whiteEff}/20</div>
+            </div>
+            <div class="mis-row">${misTags || `<span style="font-size:11.5px;color:#64748b;font-weight:700">送出檢查 ${g.attempts} 次・失誤 ${g.wrong_attempts} 次</span>`}</div>
+            <div class="gcard-actions">
+              <label class="chk-compare"><input type="checkbox" data-cmp="${esc(g.group_key)}" ${checked} /> 對比</label>
+              <div style="display:flex;gap:5px;align-items:center">
+                <button type="button" class="star-btn ${g.is_featured ? "on" : ""}" data-star="${esc(g.group_key)}" title="設為精選作品">⭐</button>
+                <button type="button" class="btn-act primary" style="padding:5px 10px;font-size:12.5px" data-show="${esc(g.group_key)}">📺 展示</button>
+                <button type="button" class="btn-act danger" style="padding:5px 8px;font-size:12.5px" data-del="${esc(g.group_key)}" title="移除此組">✕</button>
+              </div>
+            </div>
+          </div>`;
+        })
+        .join("");
+
+      $("groupsGrid").querySelectorAll("[data-show]").forEach((el) => {
+        el.addEventListener("click", () => openShowcase(el.dataset.show));
+      });
+      $("groupsGrid").querySelectorAll("[data-cmp]").forEach((chk) => {
+        chk.addEventListener("change", () => {
+          const k = chk.dataset.cmp;
+          if (chk.checked) {
+            if (state.compareKeys.size >= 4) {
+              chk.checked = false;
+              alert("並排對比最多同時選擇 4 組！");
+              return;
+            }
+            state.compareKeys.add(k);
+          } else {
+            state.compareKeys.delete(k);
+          }
+          $("btnOpenCompare").textContent = `🏆 並排對比展示 (${state.compareKeys.size})`;
+        });
+      });
+      $("groupsGrid").querySelectorAll("[data-star]").forEach((btn) => {
+        btn.addEventListener("click", () => toggleFeatured(btn.dataset.star));
+      });
+      $("groupsGrid").querySelectorAll("[data-del]").forEach((btn) => {
+        btn.addEventListener("click", () => resetGroup(btn.dataset.del));
+      });
+    }
+
+    function renderAll() {
+      renderKPIs();
+      renderSeatStrip();
+      renderGroups();
+      if ($("showcaseModal").classList.contains("show") && state.showcaseKey) {
+        renderShowcaseContent();
+      }
+      if ($("compareModal").classList.contains("show")) {
+        renderCompareContent();
+      }
+    }
+
+    /* ---- 單組大螢幕展示模式 ---- */
+    function openShowcase(groupKey) {
+      state.showcaseKey = groupKey;
+      state.showcaseIso = "ALL";
+      $("showcaseModal").classList.add("show");
+      renderShowcaseContent();
+    }
+
+    function renderShowcaseContent() {
+      const idx = state.groups.findIndex((g) => g.group_key === state.showcaseKey);
+      if (idx < 0) {
+        $("showcaseModal").classList.remove("show");
+        return;
+      }
+      const g = state.groups[idx];
+      const c = countGrid(g.grid || ".".repeat(100), g.is_completed);
+
+      $("scTitle").innerHTML = `
+        <span>${esc(groupDisplayName(g, idx))}</span>
+        ${g.title ? `<span style="background:#fdf2f8;color:#9d174d;padding:3px 12px;border-radius:999px;font-size:17px">「${esc(g.title)}」</span>` : ""}
+        ${g.is_completed ? `<span class="gcard-badge gb-done" style="font-size:14px">✅ 完全答對</span>` : `<span class="gcard-badge gb-doing" style="font-size:14px">🎨 設計中</span>`}
+      `;
+
+      $("scPrevBtn").disabled = idx <= 0;
+      $("scNextBtn").disabled = idx >= state.groups.length - 1;
+      $("scStarBtn").classList.toggle("warn-on", Boolean(g.is_featured));
+      $("scStarBtn").textContent = g.is_featured ? "⭐ 已精選" : "⭐ 設為精選";
+      $("scRoseBtn").classList.toggle("active", state.showRoses);
+      $("scAnonBtn").classList.toggle("warn-on", state.anonMode);
+      $("scMathBtn").classList.toggle("active", state.showcaseShowMath);
+      $("scMathBtn").textContent = state.showcaseShowMath ? "🔢 顯示格數：開" : "🙈 格數隱藏中";
+      $("scNumBtn").classList.toggle("active", state.showcaseShowNumbers);
+      $("scNumBtn").textContent = state.showcaseShowNumbers ? "①② 格子編號：開" : "①② 格子編號：關";
+
+      $("scSvgStage").innerHTML = buildGridSvg(g, {
+        showRoses: state.showRoses,
+        isolate: state.showcaseIso,
+        showNumbers: state.showcaseShowNumbers,
+      });
+
+      $("showcaseModal").querySelectorAll("[data-iso]").forEach((b) => {
+        b.classList.toggle("on", b.dataset.iso === state.showcaseIso);
+      });
+
+      if (state.showcaseShowMath) {
+        $("scCntG").textContent = `${c.G} 格`;
+        $("scCntR").textContent = `${c.R} 格`;
+        $("scCntB").textContent = `${c.B} 格`;
+        $("scCntW").textContent = `${c.whiteEff} 格`;
+        $("scRevealBox").className = "reveal-box";
+        $("scRevealBox").innerHTML = `
+          <div>🩶 灰玫瑰：<b>${c.G}</b> 格 ＝ ${(c.G / 100).toFixed(2)} 塊 ${c.G === 25 ? "✅" : "⚠️"}</div>
+          <div>🌹 紅玫瑰：<b>${c.R}</b> 格 ＝ ${(c.R / 100).toFixed(2)} 塊 ${c.R === 50 ? "✅" : "⚠️"}</div>
+          <div>💙 藍玫瑰：<b>${c.B}</b> 格 ＝ ${(c.B / 100).toFixed(2)} 塊 ${c.B === 5 ? "✅" : "⚠️"}</div>
+          <div>🤍 白玫瑰：<b>${c.whiteEff}</b> 格 ＝ ${(c.whiteEff / 100).toFixed(2)} 塊 ${c.whiteEff === 20 && g.is_completed ? "✅" : ""}</div>
+          <hr style="border:none;border-top:1.5px dashed #86efac;margin:6px 0" />
+          <div>合計：<b>${c.G + c.R + c.B + c.whiteEff}</b> 格 ＝ <b>${((c.G + c.R + c.B + c.whiteEff) / 100).toFixed(2)}</b> 塊</div>
+        `;
+      } else {
+        $("scCntG").textContent = "點我看";
+        $("scCntR").textContent = "點我看";
+        $("scCntB").textContent = "點我看";
+        $("scCntW").textContent = "點我看";
+        $("scRevealBox").className = "reveal-box hidden-math";
+        $("scRevealBox").innerHTML = `👀 已隱藏數值！<br>可以搭配左邊「只看某色」＋「①② 格子編號」讓全班一起數數看喔！`;
+      }
+    }
+
+    $("showcaseModal").querySelectorAll("[data-iso]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.showcaseIso = btn.dataset.iso;
+        if (state.showcaseIso !== "ALL" && !state.showcaseShowNumbers) {
+          state.showcaseShowNumbers = true;
+        }
+        renderShowcaseContent();
+      });
+    });
+
+    $("scPrevBtn").addEventListener("click", () => {
+      const idx = state.groups.findIndex((g) => g.group_key === state.showcaseKey);
+      if (idx > 0) {
+        state.showcaseKey = state.groups[idx - 1].group_key;
+        renderShowcaseContent();
+      }
+    });
+    $("scNextBtn").addEventListener("click", () => {
+      const idx = state.groups.findIndex((g) => g.group_key === state.showcaseKey);
+      if (idx >= 0 && idx < state.groups.length - 1) {
+        state.showcaseKey = state.groups[idx + 1].group_key;
+        renderShowcaseContent();
+      }
+    });
+    $("scRoseBtn").addEventListener("click", () => {
+      state.showRoses = !state.showRoses;
+      $("btnPreviewMode").classList.toggle("active", state.showRoses);
+      $("btnPreviewMode").textContent = state.showRoses ? "🌹 玫瑰花預覽：開" : "🎨 純色塊預覽：開";
+      renderAll();
+    });
+    $("scAnonBtn").addEventListener("click", () => {
+      state.anonMode = !state.anonMode;
+      $("btnAnonMode").classList.toggle("warn-on", state.anonMode);
+      $("btnAnonMode").textContent = state.anonMode ? "🙈 匿名展示：開" : "🙈 匿名展示：關";
+      renderAll();
+    });
+    $("scMathBtn").addEventListener("click", () => {
+      state.showcaseShowMath = !state.showcaseShowMath;
+      renderShowcaseContent();
+    });
+    $("scNumBtn").addEventListener("click", () => {
+      state.showcaseShowNumbers = !state.showcaseShowNumbers;
+      renderShowcaseContent();
+    });
+    $("scStarBtn").addEventListener("click", () => {
+      if (state.showcaseKey) toggleFeatured(state.showcaseKey);
+    });
+    $("scCloseBtn").addEventListener("click", () => $("showcaseModal").classList.remove("show"));
+    $("showcaseModal").addEventListener("click", (e) => {
+      if (e.target === $("showcaseModal")) $("showcaseModal").classList.remove("show");
+    });
+
+    /* ---- 多組並排對比模式 ---- */
+    function getCompareList() {
+      if (state.compareKeys.size > 0) {
+        return state.groups.filter((g) => state.compareKeys.has(g.group_key));
+      }
+      const completed = state.groups.filter((g) => g.is_completed);
+      const pool = completed.length >= 2 ? completed : state.groups;
+      return pool.slice(0, 4);
+    }
+
+    function renderCompareContent() {
+      const targets = getCompareList();
+      $("cmpRoseBtn").classList.toggle("active", state.showRoses);
+      $("cmpAnonBtn").classList.toggle("warn-on", state.anonMode);
+      $("cmpMathBtn").classList.toggle("active", state.showcaseShowMath);
+      $("cmpMathBtn").textContent = state.showcaseShowMath ? "🔢 顯示格數：開" : "🙈 格數隱藏中";
+
+      if (targets.length === 0) {
+        $("compareGrid").innerHTML = `<div class="empty-state">目前沒有可對比的組別作品。</div>`;
+        return;
+      }
+
+      $("compareGrid").innerHTML = targets
+        .map((g, idx) => {
+          const c = countGrid(g.grid || ".".repeat(100), g.is_completed);
+          return `<div class="cmp-card">
+            <div style="font-size:17px;font-weight:900;color:#1e3a8a">${esc(groupDisplayName(g, idx))} ${g.is_completed ? "✅" : ""}</div>
+            ${g.title ? `<div style="font-size:14.5px;font-weight:800;color:#9d174d">「${esc(g.title)}」</div>` : ""}
+            ${buildGridSvg(g, { showRoses: state.showRoses })}
+            ${
+              state.showcaseShowMath
+                ? `<div style="font-size:13.5px;font-weight:800;color:#334155">灰 ${c.G} (${(c.G / 100).toFixed(2)})・紅 ${c.R} (${(c.R / 100).toFixed(2)})・藍 ${c.B} (${(c.B / 100).toFixed(2)})・白 ${c.whiteEff} (${(c.whiteEff / 100).toFixed(2)})</div>`
+                : `<div style="font-size:13px;font-weight:800;color:#64748b">👀 請觀察不同造型是否都符合 0.25、0.5、0.05、0.20</div>`
+            }
+          </div>`;
+        })
+        .join("");
+    }
+
+    $("btnOpenCompare").addEventListener("click", () => {
+      $("compareModal").classList.add("show");
+      renderCompareContent();
+    });
+    $("cmpRoseBtn").addEventListener("click", () => {
+      state.showRoses = !state.showRoses;
+      $("btnPreviewMode").classList.toggle("active", state.showRoses);
+      $("btnPreviewMode").textContent = state.showRoses ? "🌹 玫瑰花預覽：開" : "🎨 純色塊預覽：開";
+      renderAll();
+    });
+    $("cmpAnonBtn").addEventListener("click", () => {
+      state.anonMode = !state.anonMode;
+      $("btnAnonMode").classList.toggle("warn-on", state.anonMode);
+      $("btnAnonMode").textContent = state.anonMode ? "🙈 匿名展示：開" : "🙈 匿名展示：關";
+      renderAll();
+    });
+    $("cmpMathBtn").addEventListener("click", () => {
+      state.showcaseShowMath = !state.showcaseShowMath;
+      renderCompareContent();
+    });
+    $("cmpCloseBtn").addEventListener("click", () => $("compareModal").classList.remove("show"));
+    $("compareModal").addEventListener("click", (e) => {
+      if (e.target === $("compareModal")) $("compareModal").classList.remove("show");
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if ($("showcaseModal").classList.contains("show")) {
+        if (e.key === "ArrowLeft") $("scPrevBtn").click();
+        else if (e.key === "ArrowRight") $("scNextBtn").click();
+        else if (e.key === "Escape") $("scCloseBtn").click();
+      } else if ($("compareModal").classList.contains("show") && e.key === "Escape") {
+        $("cmpCloseBtn").click();
+      }
+    });
+
+    /* ---- 後台操作 API ---- */
+    const SETUP_SQL = `create table if not exists public.rose_garden_groups_403 (
+  group_key text primary key,
+  group_no integer not null check (group_no between 1 and 15),
+  seats integer[] not null check (cardinality(seats) between 1 and 3),
+  grid text not null default repeat('.', 100) check (char_length(grid) = 100 and grid ~ '^[.GRBW]{100}$'),
+  title text not null default '',
+  note text not null default '',
+  attempts integer not null default 0 check (attempts >= 0),
+  wrong_attempts integer not null default 0 check (wrong_attempts >= 0),
+  misconceptions jsonb not null default '[]'::jsonb,
+  processed_ops jsonb not null default '[]'::jsonb,
+  is_completed boolean not null default false,
+  completed_at timestamptz,
+  is_featured boolean not null default false,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create unique index if not exists idx_rose_garden_groups_403_active_no on public.rose_garden_groups_403 (group_no) where is_active = true;
+create index if not exists idx_rose_garden_groups_403_active_seats on public.rose_garden_groups_403 using gin (seats) where is_active = true;
+alter table public.rose_garden_groups_403 enable row level security;
+revoke all on table public.rose_garden_groups_403 from public, anon, authenticated;
+grant select, insert, update, delete on table public.rose_garden_groups_403 to service_role;
+drop policy if exists "deny_direct_client_access" on public.rose_garden_groups_403;
+create policy "deny_direct_client_access" on public.rose_garden_groups_403 for all to anon, authenticated using (false) with check (false);
+create or replace function public.set_rose_garden_groups_403_updated_at() returns trigger language plpgsql security invoker set search_path = public as $$ begin new.updated_at = now(); return new; end; $$;
+drop trigger if exists trg_rose_garden_groups_403_updated_at on public.rose_garden_groups_403;
+create trigger trg_rose_garden_groups_403_updated_at before update on public.rose_garden_groups_403 for each row execute function public.set_rose_garden_groups_403_updated_at();`;
+
+    function showSetupBanner() {
+      const el = $("setupAlert");
+      el.classList.add("show");
+      el.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <span>⚠️ Supabase 尚未建立資料表 <code>public.rose_garden_groups_403</code>，請點右方按鈕複製 SQL，貼到 Supabase Dashboard → SQL Editor 執行一次即可啟用 15 組即時同步！</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn-act primary" id="btnCopySetupSql">📋 複製建表 SQL</button>
+          <a href="https://supabase.com/dashboard/project/ppdgubracsneozahujxl/sql/new" target="_blank" rel="noopener" class="btn-act">🔗 開啟 SQL Editor</a>
+        </div>
+      </div>`;
+      $("btnCopySetupSql").addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(SETUP_SQL);
+          $("btnCopySetupSql").textContent = "✅ 已複製 SQL！";
+        } catch {
+          prompt("請複製以下 SQL 到 Supabase SQL Editor 執行：", SETUP_SQL);
+        }
+      });
+    }
+
+    function scheduleAutoPoll() {
+      clearTimeout(state.autoTimer);
+      state.autoTimer = null;
+      if (state.autoOn && state.pw && document.visibilityState !== "hidden") {
+        state.autoTimer = setTimeout(() => fetchGroups(false), 3000);
+      }
+    }
+
+    async function fetchGroups(forceRender = false) {
+      if (!state.pw || state.isFetching) return;
+      state.isFetching = true;
+      clearTimeout(state.autoTimer);
+      try {
+        const res = await apiCall({ action: "teacher_list", pw: state.pw }, 7000);
+        if (res.table_missing) {
+          showSetupBanner();
+        } else {
+          $("setupAlert").classList.remove("show");
+        }
+        const nextGroups = res.groups || [];
+        const nextSig = JSON.stringify(nextGroups);
+        state.groups = nextGroups;
+        const validKeys = new Set(state.groups.map((g) => g.group_key));
+        for (const k of Array.from(state.compareKeys)) {
+          if (!validKeys.has(k)) state.compareKeys.delete(k);
+        }
+        state.lastOkTime = new Date().toLocaleTimeString("zh-TW", { hour12: false });
+        const statusEl = $("lastUpdateTxt");
+        statusEl.style.color = "#64748b";
+        statusEl.textContent = `最後更新：${state.lastOkTime}`;
+        if (forceRender || nextSig !== state.lastGroupsSig) {
+          state.lastGroupsSig = nextSig;
+          renderAll();
+        }
+      } catch (err) {
+        if (String(err.message).includes("rose_garden_groups_403")) {
+          showSetupBanner();
+        } else {
+          const statusEl = $("lastUpdateTxt");
+          statusEl.style.color = "#b45309";
+          statusEl.textContent = state.lastOkTime
+            ? `⚠️ 網路不穩重試中（保留 ${state.lastOkTime} 資料）`
+            : "⚠️ 網路連線異常，重試中...";
+        }
+      } finally {
+        state.isFetching = false;
+        scheduleAutoPoll();
+      }
+    }
+
+    async function toggleFeatured(groupKey) {
+      const g = state.groups.find((x) => x.group_key === groupKey);
+      if (!g) return;
+      try {
+        await apiCall(
+          {
+            action: "teacher_toggle_featured",
+            pw: state.pw,
+            group_key: groupKey,
+            is_featured: !g.is_featured,
+          },
+          7000
+        );
+        await fetchGroups(true);
+      } catch (err) {
+        alert("更新精選狀態失敗：" + err.message);
+      }
+    }
+
+    async function resetGroup(groupKey) {
+      const g = state.groups.find((x) => x.group_key === groupKey);
+      const label = g ? `第 ${g.group_no} 組（${g.seats.join("・")}號）` : groupKey;
+      if (!confirm(`確定要移除「${label}」嗎？該組座號與名額將會釋出。`)) return;
+      try {
+        await apiCall({ action: "teacher_reset", pw: state.pw, group_key: groupKey }, 7000);
+        state.compareKeys.delete(groupKey);
+        await fetchGroups(true);
+      } catch (err) {
+        alert("移除失敗：" + err.message);
+      }
+    }
+
+    async function resetAll() {
+      if (!confirm("確定要「清空全班所有組別紀錄」嗎？\n通常用於上課前或換班前歸零（清空後學生可重新配對登入）。")) return;
+      try {
+        await apiCall({ action: "teacher_reset", pw: state.pw, group_key: "ALL" }, 7000);
+        state.compareKeys.clear();
+        await fetchGroups(true);
+      } catch (err) {
+        alert("清空失敗：" + err.message);
+      }
+    }
+
+    function exportCsv() {
+      const header = ["組別", "座號", "作品名稱", "是否達標", "灰玫瑰(25)", "紅玫瑰(50)", "藍玫瑰(5)", "白玫瑰有效(20)", "檢查次數", "失誤次數", "迷思紀錄", "精選", "最後更新"];
+      const lines = [header.join(",")];
+      state.groups.forEach((g) => {
+        const c = countGrid(g.grid || ".".repeat(100), g.is_completed);
+        const misTxt = (g.misconceptions || []).map((m) => MIS_LABELS[m] || m).join("/");
+        lines.push(
+          [
+            `第${g.group_no}組`,
+            `"${(g.seats || []).join("・")}"`,
+            `"${(g.title || "").replace(/"/g, '""')}"`,
+            g.is_completed ? "已完成" : "進行中",
+            c.G,
+            c.R,
+            c.B,
+            c.whiteEff,
+            g.attempts,
+            g.wrong_attempts,
+            `"${misTxt}"`,
+            g.is_featured ? "⭐" : "",
+            fmtTime(g.updated_at),
+          ].join(",")
+        );
+      });
+      const blob = new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `403_正方形玫瑰花圃成果_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function tryLogin(pw) {
+      const errEl = $("loginErr");
+      const btn = $("btnLoginSubmit");
+      errEl.textContent = "";
+      btn.disabled = true;
+      btn.textContent = "驗證中...";
+      try {
+        const res = await apiCall({ action: "teacher_list", pw }, 8000);
+        state.pw = pw;
+        try {
+          sessionStorage.setItem(PW_KEY, pw);
+        } catch {}
+        state.groups = res.groups || [];
+        state.lastGroupsSig = JSON.stringify(state.groups);
+        $("sec-login").style.display = "none";
+        $("sec-dashboard").style.display = "block";
+        $("btnLogout").style.display = "inline-flex";
+        if (res.table_missing) {
+          showSetupBanner();
+        } else {
+          $("setupAlert").classList.remove("show");
+        }
+        state.lastOkTime = new Date().toLocaleTimeString("zh-TW", { hour12: false });
+        $("lastUpdateTxt").style.color = "#64748b";
+        $("lastUpdateTxt").textContent = `最後更新：${state.lastOkTime}`;
+        renderAll();
+        scheduleAutoPoll();
+      } catch (err) {
+        if (String(err.message).includes("rose_garden_groups_403")) {
+          state.pw = pw;
+          try {
+            sessionStorage.setItem(PW_KEY, pw);
+          } catch {}
+          $("sec-login").style.display = "none";
+          $("sec-dashboard").style.display = "block";
+          $("btnLogout").style.display = "inline-flex";
+          showSetupBanner();
+          renderAll();
+        } else {
+          errEl.textContent = "密碼錯誤或連線失敗，請重新確認！";
+          try {
+            sessionStorage.removeItem(PW_KEY);
+          } catch {}
+        }
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "登入教師後台";
+      }
+    }
+
+    $("loginForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      tryLogin($("inputPw").value);
+    });
+    $("btnLogout").addEventListener("click", () => {
+      state.pw = "";
+      state.groups = [];
+      state.lastGroupsSig = "";
+      clearTimeout(state.autoTimer);
+      try {
+        sessionStorage.removeItem(PW_KEY);
+      } catch {}
+      $("inputPw").value = "";
+      $("sec-login").style.display = "block";
+      $("sec-dashboard").style.display = "none";
+      $("btnLogout").style.display = "none";
+    });
+    $("btnRefresh").addEventListener("click", () => fetchGroups(true));
+    $("btnAuto").addEventListener("click", () => {
+      state.autoOn = !state.autoOn;
+      $("btnAuto").classList.toggle("active", state.autoOn);
+      $("btnAuto").textContent = state.autoOn ? "⏱ 自動更新：開（每 3 秒）" : "⏸ 自動更新：已暫停";
+      scheduleAutoPoll();
+    });
+    window.addEventListener("online", () => {
+      if (state.pw) fetchGroups(false);
+    });
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && state.pw && state.autoOn) {
+        fetchGroups(false);
+      } else {
+        clearTimeout(state.autoTimer);
+      }
+    });
+    $("btnPreviewMode").addEventListener("click", () => {
+      state.showRoses = !state.showRoses;
+      $("btnPreviewMode").classList.toggle("active", state.showRoses);
+      $("btnPreviewMode").textContent = state.showRoses ? "🌹 玫瑰花預覽：開" : "🎨 純色塊預覽：開";
+      renderAll();
+    });
+    $("btnAnonMode").addEventListener("click", () => {
+      state.anonMode = !state.anonMode;
+      $("btnAnonMode").classList.toggle("warn-on", state.anonMode);
+      $("btnAnonMode").textContent = state.anonMode ? "🙈 匿名展示：開" : "🙈 匿名展示：關";
+      renderAll();
+    });
+    $("btnResetAll").addEventListener("click", resetAll);
+    $("btnExportCsv").addEventListener("click", exportCsv);
+
+    $("btnShowQr").addEventListener("click", () => {
+      const base = window.location.href.replace(/teacher\.html.*$/i, "");
+      $("studentUrlTxt").textContent = base;
+      $("qrModal").classList.add("show");
+    });
+    $("btnQrClose").addEventListener("click", () => $("qrModal").classList.remove("show"));
+    $("qrModal").addEventListener("click", (e) => {
+      if (e.target === $("qrModal")) $("qrModal").classList.remove("show");
+    });
+
+    try {
+      const savedPw = sessionStorage.getItem(PW_KEY);
+      if (savedPw) tryLogin(savedPw);
+    } catch {}
+  </script>
+</body>
+</html>

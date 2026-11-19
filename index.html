@@ -1,0 +1,2597 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+  />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>正方形玫瑰花圃（百格紙）｜403 數學雙人操作版</title>
+  <style>
+    :root {
+      --bg: #eef4fb;
+      --surface: #ffffff;
+      --border: #c5d7ea;
+      --primary: #1e40af;
+      --primary-dark: #1e3a8a;
+      --text: #1e293b;
+      --muted: #64748b;
+      --ok: #16a34a;
+      --warn: #d97706;
+      --bad: #dc2626;
+      --c-gray-bg: #d1d5db;
+      --c-gray-bd: #9ca3af;
+      --c-red-bg: #f472b6;
+      --c-red-bd: #db2777;
+      --c-blue-bg: #38bdf8;
+      --c-blue-bd: #0284c7;
+      --c-white-bg: #fffef7;
+      --c-white-bd: #cbd5e1;
+      --c-empty-bg: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: none;
+    }
+
+    #app {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-rows: 54px minmax(0, 1fr);
+      overflow: hidden;
+    }
+
+    /* 頂部列 */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 0 12px;
+      background: #f8fbff;
+      border-bottom: 2px solid var(--border);
+      min-width: 0;
+    }
+    .hdr-left,
+    .hdr-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .logo {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--primary-dark);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .group-pill {
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 900;
+      background: #dbeafe;
+      color: var(--primary);
+      border: 2px solid #93c5fd;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+    .group-pill:active {
+      transform: scale(0.96);
+    }
+    .sync-badge {
+      font-size: 13px;
+      font-weight: 900;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: #166534;
+      border: 1.5px solid #86efac;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .sync-badge.saving {
+      background: #fef9c3;
+      color: #854d0e;
+      border-color: #fde047;
+    }
+    .sync-badge.err {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fca5a5;
+    }
+    .hdr-btn {
+      min-height: 38px;
+      padding: 0 11px;
+      border-radius: 11px;
+      border: 2px solid #b8cfe6;
+      background: #e8f1fa;
+      color: var(--primary-dark);
+      font-size: 13.5px;
+      font-weight: 900;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .hdr-btn:active {
+      transform: scale(0.96);
+    }
+    .hdr-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary-dark);
+    }
+
+    /* 主工作區：左側題目與畫筆 + 右側百格紙舞台 */
+    main {
+      display: grid;
+      grid-template-columns: minmax(300px, 365px) minmax(0, 1fr);
+      gap: 10px;
+      padding: 10px 12px;
+      min-height: 0;
+      min-width: 0;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+      padding-right: 2px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 9px 12px;
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.05);
+    }
+
+    .prob-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 5px;
+      padding-bottom: 5px;
+      border-bottom: 2px solid #e6eff8;
+    }
+    .prob-head h2 {
+      font-size: 15.5px;
+      font-weight: 900;
+      color: var(--primary-dark);
+    }
+
+    .prob-intro {
+      font-size: 15px;
+      font-weight: 800;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+    .prob-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 14.5px;
+      font-weight: 800;
+      color: #1e293b;
+    }
+    .prob-list li {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1.35;
+    }
+    .swatch-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      flex: none;
+      border: 2px solid rgba(15, 23, 42, 0.18);
+    }
+    .prob-tip {
+      margin-top: 7px;
+      background: #fffbeb;
+      border: 1.5px solid #fde68a;
+      color: #92400e;
+      font-size: 12.5px;
+      font-weight: 800;
+      padding: 5px 9px;
+      border-radius: 10px;
+    }
+
+    /* 畫筆選擇區 */
+    .palette-title {
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--primary-dark);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .total-badge {
+      font-size: 12.5px;
+      font-weight: 900;
+      color: #475569;
+      background: #f1f5f9;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .brush-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .brush-btn {
+      width: 100%;
+      min-height: 41px;
+      padding: 5px 9px;
+      border-radius: 12px;
+      border: 2.5px solid #cbd5e1;
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+      transition: transform 0.08s, border-color 0.12s, box-shadow 0.12s;
+    }
+    .brush-btn:active {
+      transform: scale(0.98);
+    }
+    .brush-btn.active {
+      border-color: var(--primary);
+      background: #eff6ff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.22);
+    }
+    .brush-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .brush-ico {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 2px solid rgba(15, 23, 42, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex: none;
+    }
+    .brush-info {
+      text-align: left;
+      min-width: 0;
+    }
+    .brush-name {
+      font-size: 15px;
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 1.15;
+    }
+    .brush-sub {
+      font-size: 12px;
+      font-weight: 800;
+      color: #64748b;
+    }
+    .brush-count {
+      font-size: 13px;
+      font-weight: 900;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      color: #334155;
+      white-space: nowrap;
+      flex: none;
+    }
+    .brush-btn.active .brush-count {
+      border-color: #93c5fd;
+      color: var(--primary);
+    }
+
+    .tool-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .tool-btn {
+      min-height: 40px;
+      padding: 4px 6px;
+      border-radius: 11px;
+      border: 2px solid #cbd5e1;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+    }
+    .tool-btn:active {
+      transform: scale(0.96);
+    }
+    .tool-btn:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+    }
+    .tool-btn.danger {
+      color: #b91c1c;
+      border-color: #fecaca;
+      background: #fef2f2;
+    }
+
+    .submit-btn {
+      width: 100%;
+      min-height: 52px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #1d4ed8, #1e40af);
+      color: #fff;
+      font-size: 17.5px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #172554;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .submit-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #172554;
+    }
+    .submit-btn.done {
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      box-shadow: 0 4px 0 #14532d;
+    }
+
+    .feedback-box {
+      border-radius: 14px;
+      padding: 9px 11px;
+      font-size: 13.5px;
+      font-weight: 800;
+      line-height: 1.45;
+      display: none;
+    }
+    .feedback-box.show {
+      display: block;
+    }
+    .feedback-box.warn {
+      background: #fff7ed;
+      border: 2px solid #fdba74;
+      color: #9a3412;
+    }
+    .feedback-box.ok {
+      background: #f0fdf4;
+      border: 2px solid #86efac;
+      color: #166534;
+    }
+
+    /* 右側百格紙舞台 */
+    .stage {
+      background: var(--surface);
+      border: 2.5px solid var(--border);
+      border-radius: 22px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 0;
+      min-width: 0;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .stage-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .stage-banner {
+      font-size: 14.5px;
+      font-weight: 900;
+      color: var(--primary-dark);
+      background: #eff6ff;
+      border: 1.5px solid #bfdbfe;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+    .stage-banner.done {
+      background: #dcfce7;
+      border-color: #86efac;
+      color: #166534;
+    }
+    .stage-hint {
+      font-size: 13px;
+      font-weight: 800;
+      color: #64748b;
+    }
+
+    .board-wrap {
+      flex: 1;
+      min-height: 0;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 18px 8px 6px 20px;
+    }
+
+    .board-frame {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ruler-top {
+      position: absolute;
+      top: -20px;
+      left: 0;
+      right: 0;
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      text-align: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: #64748b;
+      pointer-events: none;
+    }
+    .ruler-left {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -20px;
+      width: 18px;
+      display: grid;
+      grid-template-rows: repeat(10, 1fr);
+      align-items: center;
+      text-align: right;
+      font-size: 11px;
+      font-weight: 800;
+      color: #64748b;
+      pointer-events: none;
+    }
+
+    .garden-board {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: repeat(10, 1fr);
+      border: 3.5px solid #0f172a;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #ffffff;
+      touch-action: none;
+      box-shadow: 0 8px 24px rgba(30, 58, 95, 0.12);
+    }
+
+    .cell {
+      border-right: 1.5px solid #475569;
+      border-bottom: 1.5px solid #475569;
+      background-color: var(--c-empty-bg);
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 76%;
+      transition: background-color 0.06s ease;
+    }
+    .cell[data-col="9"] {
+      border-right: none;
+    }
+    .cell[data-row="9"] {
+      border-bottom: none;
+    }
+    /* 5x5 輔助十字線（方便 5 格、10 格點數，填色後依然清楚） */
+    .cell[data-col="4"] {
+      border-right: 2.5px solid #0f172a;
+    }
+    .cell[data-row="4"] {
+      border-bottom: 2.5px solid #0f172a;
+    }
+
+    .cell[data-c="G"] {
+      background-color: var(--c-gray-bg);
+    }
+    .cell[data-c="R"] {
+      background-color: var(--c-red-bg);
+    }
+    .cell[data-c="B"] {
+      background-color: var(--c-blue-bg);
+    }
+    .cell[data-c="W"] {
+      background-color: #fefce8;
+    }
+
+    /* 玫瑰花圖案模式（內嵌 SVG Data URI，零 DOM 重繪） */
+    .garden-board.show-roses .cell[data-c="G"] {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><circle cx='18' cy='18' r='12' fill='%239ca3af' stroke='%236b7280' stroke-width='1.8'/><path d='M18 11c3.5 0 6 2.5 6 5.5S21.5 22 18 22s-5.5-2.2-5.5-5 2-4.5 4.5-4.5c2 0 3.5 1.3 3.5 3s-1.2 2.8-2.6 2.8c-1.1 0-1.9-.7-1.9-1.6' fill='none' stroke='%23f9fafb' stroke-width='2' stroke-linecap='round'/></svg>");
+    }
+    .garden-board.show-roses .cell[data-c="R"] {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><circle cx='18' cy='18' r='12' fill='%23ec4899' stroke='%23be185d' stroke-width='1.8'/><path d='M18 11c3.5 0 6 2.5 6 5.5S21.5 22 18 22s-5.5-2.2-5.5-5 2-4.5 4.5-4.5c2 0 3.5 1.3 3.5 3s-1.2 2.8-2.6 2.8c-1.1 0-1.9-.7-1.9-1.6' fill='none' stroke='%23fdf2f8' stroke-width='2' stroke-linecap='round'/></svg>");
+    }
+    .garden-board.show-roses .cell[data-c="B"] {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><circle cx='18' cy='18' r='12' fill='%230ea5e9' stroke='%230369a1' stroke-width='1.8'/><path d='M18 11c3.5 0 6 2.5 6 5.5S21.5 22 18 22s-5.5-2.2-5.5-5 2-4.5 4.5-4.5c2 0 3.5 1.3 3.5 3s-1.2 2.8-2.6 2.8c-1.1 0-1.9-.7-1.9-1.6' fill='none' stroke='%23f0f9ff' stroke-width='2' stroke-linecap='round'/></svg>");
+    }
+    .garden-board.show-roses .cell[data-c="W"] {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><circle cx='18' cy='18' r='12' fill='%23ffffff' stroke='%23cbd5e1' stroke-width='2'/><path d='M18 11c3.5 0 6 2.5 6 5.5S21.5 22 18 22s-5.5-2.2-5.5-5 2-4.5 4.5-4.5c2 0 3.5 1.3 3.5 3s-1.2 2.8-2.6 2.8c-1.1 0-1.9-.7-1.9-1.6' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/></svg>");
+    }
+
+    /* 選組員座號遮罩 */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 700;
+      background: linear-gradient(155deg, #dbeafe 0%, #eff6ff 55%, #fdf2f8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+    .overlay.hidden {
+      display: none;
+    }
+    .login-card {
+      background: #ffffff;
+      border: 3px solid #93c5fd;
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(30, 58, 95, 0.18);
+      max-width: 820px;
+      width: 100%;
+      max-height: 94dvh;
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+    .login-head {
+      text-align: center;
+    }
+    .login-badge {
+      display: inline-block;
+      background: var(--primary);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+      padding: 4px 13px;
+      border-radius: 999px;
+      margin-bottom: 6px;
+    }
+    .login-head h1 {
+      font-size: 25px;
+      font-weight: 900;
+      color: var(--primary-dark);
+      margin-bottom: 3px;
+    }
+    .login-head p {
+      font-size: 15.5px;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    .selected-bar {
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: 15px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .selected-chips {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 7px;
+      font-size: 14.5px;
+      font-weight: 800;
+      color: #475569;
+    }
+    .sel-chip {
+      background: #dbeafe;
+      color: var(--primary);
+      border: 2px solid #60a5fa;
+      border-radius: 999px;
+      padding: 4px 11px;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .lobby-stat {
+      font-size: 13.5px;
+      font-weight: 900;
+      color: #0f766e;
+      background: #ccfbf1;
+      padding: 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .lobby-stat.offline {
+      color: #9a3412;
+      background: #ffedd5;
+    }
+
+    .seat-grid-wrap {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+      padding: 3px;
+    }
+    .seat-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 9px;
+    }
+    .seat-btn {
+      min-height: 54px;
+      border-radius: 14px;
+      border: 2.5px solid #bfd4ea;
+      background: #f8fafc;
+      color: var(--primary-dark);
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 0 #cbd5e1;
+      transition: transform 0.08s, background 0.12s, border-color 0.12s;
+    }
+    .seat-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #cbd5e1;
+    }
+    .seat-btn.picked {
+      background: #1e40af;
+      color: #fff;
+      border-color: #1e3a8a;
+      box-shadow: 0 3px 0 #172554;
+    }
+    .seat-btn.occupied {
+      background: #fffbeb;
+      border-color: #fcd34d;
+    }
+    .seat-btn.occupied.picked {
+      background: #1e40af;
+      border-color: #1e3a8a;
+    }
+    .seat-btn .sub {
+      font-size: 11px;
+      font-weight: 800;
+      opacity: 0.85;
+      margin-top: 1px;
+    }
+
+    .login-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .btn-start {
+      flex: 1;
+      min-width: 220px;
+      min-height: 50px;
+      border: none;
+      border-radius: 15px;
+      background: #16a34a;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #14532d;
+    }
+    .btn-start:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .btn-refresh-lobby {
+      min-height: 50px;
+      padding: 0 14px;
+      border-radius: 14px;
+      border: 2px solid #cbd5e1;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 14.5px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .active-groups-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #64748b;
+      padding-top: 4px;
+      border-top: 1.5px dashed #cbd5e1;
+    }
+    .quick-grp-chip {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1.5px solid #93c5fd;
+      background: #eff6ff;
+      color: var(--primary);
+      font-size: 12.5px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .quick-grp-chip.done {
+      background: #dcfce7;
+      border-color: #86efac;
+      color: #166534;
+    }
+
+    /* 彈窗 */
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.58);
+      z-index: 800;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .modal-mask.show {
+      display: flex;
+    }
+    .mbox {
+      background: #fff;
+      border-radius: 22px;
+      padding: 20px 24px;
+      max-width: 540px;
+      width: 100%;
+      max-height: 90dvh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+    .mbox h3 {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--primary-dark);
+    }
+    .rowbtn {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .btn {
+      min-height: 44px;
+      padding: 0 16px;
+      border-radius: 12px;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-size: 15.5px;
+      font-weight: 900;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .btn.ghost {
+      background: #f1f5f9;
+      color: #334155;
+      border: 2px solid #cbd5e1;
+    }
+    .btn.ok {
+      background: #16a34a;
+    }
+    .btn.danger {
+      background: #dc2626;
+    }
+
+    .title-input {
+      width: 100%;
+      padding: 10px 13px;
+      border-radius: 12px;
+      border: 2px solid #cbd5e1;
+      font-size: 16px;
+      font-weight: 800;
+      outline: none;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+    .title-input:focus {
+      border-color: var(--primary);
+    }
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .preset-tag {
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1.5px solid #fbcfe8;
+      background: #fdf2f8;
+      color: #9d174d;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .check-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .check-pill {
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+      font-size: 14px;
+      font-weight: 900;
+      color: #166534;
+    }
+
+    /* 直向 iPad / 平板響應式 */
+    @media (max-width: 900px) {
+      header {
+        padding: 0 8px;
+        gap: 6px;
+      }
+      .hdr-left,
+      .hdr-right {
+        gap: 5px;
+      }
+      .logo {
+        font-size: 15px;
+      }
+      .group-pill {
+        padding: 5px 9px;
+        font-size: 12.5px;
+      }
+      .sync-badge {
+        padding: 4px 8px;
+        font-size: 11.5px;
+      }
+      .hdr-btn {
+        min-height: 34px;
+        padding: 0 8px;
+        font-size: 12px;
+      }
+      main {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(0, 1fr);
+      }
+      .sidebar {
+        max-height: 41dvh;
+      }
+      .brush-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .brush-btn.eraser-wide {
+        grid-column: span 2;
+      }
+      .seat-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+    }
+    @media (min-width: 700px) and (max-width: 900px) {
+      .sidebar {
+        max-height: none;
+        overflow-y: visible;
+        display: grid;
+        grid-template-columns: 0.92fr 1.28fr;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .sidebar .card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .sidebar .feedback-box {
+        grid-column: 1 / -1;
+      }
+    }
+    @media (max-width: 780px) {
+      .logo-text {
+        display: none;
+      }
+    }
+    @media (max-width: 600px) {
+      .seat-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 登入與選座號畫面（1~29 號，兩兩一組，最多 15 組） -->
+  <div class="overlay" id="loginOverlay">
+    <div class="login-card">
+      <div class="login-head">
+        <div class="login-badge">403 數學互動課堂・最多 15 組同時在線</div>
+        <h1>🌹 正方形玫瑰花圃（百格紙）</h1>
+        <p>請點選這台 iPad 組員的座號（1～29 號，兩兩一組；單人一組請選 1 位）</p>
+      </div>
+
+      <div class="selected-bar">
+        <div class="selected-chips" id="selectedChips">
+          <span>尚未選擇組員座號</span>
+        </div>
+        <div class="lobby-stat" id="lobbyStat">線上組數：0 / 15 組</div>
+      </div>
+
+      <div class="seat-grid-wrap">
+        <div class="seat-grid" id="seatGrid"></div>
+      </div>
+
+      <div class="login-footer">
+        <button type="button" class="btn-refresh-lobby" id="btnRefreshLobby">🔄 更新線上狀態</button>
+        <button type="button" class="btn-start" id="btnStartGroup" disabled>請先點選組員座號</button>
+      </div>
+
+      <div class="active-groups-bar" id="activeGroupsBar" style="display: none"></div>
+    </div>
+  </div>
+
+  <!-- 主操作區 -->
+  <div id="app">
+    <header>
+      <div class="hdr-left">
+        <div class="logo">🌹 <span class="logo-text">正方形玫瑰花圃</span></div>
+        <button type="button" class="group-pill" id="btnChangeGroup" title="點選更換組員座號">
+          👥 <span id="groupLabel">未組隊</span>
+        </button>
+      </div>
+      <div class="hdr-right">
+        <div class="sync-badge" id="syncBadge" title="點選立即同步（斷線時會自動保存在這台裝置，恢復連線後補傳）">☁️ 準備就緒</div>
+        <button type="button" class="hdr-btn active" id="btnStyleMode">🌹 玫瑰花模式</button>
+        <button type="button" class="hdr-btn" id="btnQr">📱 QR</button>
+        <button type="button" class="hdr-btn" id="btnFs">⛶ 全螢幕</button>
+      </div>
+    </header>
+
+    <main>
+      <aside class="sidebar">
+        <section class="card">
+          <div class="prob-head">
+            <h2>📖 課本題目（百格紙）</h2>
+          </div>
+          <p class="prob-intro">有一塊正方形玫瑰花圃，想要：</p>
+          <ul class="prob-list">
+            <li>
+              <span class="swatch-dot" style="background: var(--c-gray-bg)"></span>
+              <span><b>0.25</b> 塊種 <b>灰玫瑰</b>，塗灰色。</span>
+            </li>
+            <li>
+              <span class="swatch-dot" style="background: var(--c-red-bg)"></span>
+              <span><b>0.5</b> 塊種 <b>紅玫瑰</b>，塗粉紅色。</span>
+            </li>
+            <li>
+              <span class="swatch-dot" style="background: var(--c-blue-bg)"></span>
+              <span><b>0.05</b> 塊種 <b>藍玫瑰</b>，塗藍色。</span>
+            </li>
+            <li>
+              <span class="swatch-dot" style="background: var(--c-white-bg); border-style: dashed"></span>
+              <span>剩下的 <b>0.20</b> 塊種 <b>白玫瑰</b>。</span>
+            </li>
+          </ul>
+          <div class="prob-tip">💡 提示：整塊百格紙＝100 小格（代表 1 塊），可以自由設計漂亮的花圃圖案喔！</div>
+        </section>
+
+        <section class="card">
+          <div class="palette-title">
+            <span>🎨 選擇玫瑰畫筆（點或滑動上色）</span>
+            <span class="total-badge" id="totalBadge">已塗 0 / 100 格</span>
+          </div>
+
+          <div class="brush-list" id="brushList">
+            <button type="button" class="brush-btn active" data-brush="G">
+              <div class="brush-left">
+                <div class="brush-ico" style="background: var(--c-gray-bg)">🩶</div>
+                <div class="brush-info">
+                  <div class="brush-name">灰玫瑰</div>
+                  <div class="brush-sub">題目：0.25 塊</div>
+                </div>
+              </div>
+              <span class="brush-count" id="cnt-G">已塗 0 格</span>
+            </button>
+
+            <button type="button" class="brush-btn" data-brush="R">
+              <div class="brush-left">
+                <div class="brush-ico" style="background: var(--c-red-bg)">🌹</div>
+                <div class="brush-info">
+                  <div class="brush-name">紅玫瑰</div>
+                  <div class="brush-sub">題目：0.5 塊</div>
+                </div>
+              </div>
+              <span class="brush-count" id="cnt-R">已塗 0 格</span>
+            </button>
+
+            <button type="button" class="brush-btn" data-brush="B">
+              <div class="brush-left">
+                <div class="brush-ico" style="background: var(--c-blue-bg)">💙</div>
+                <div class="brush-info">
+                  <div class="brush-name">藍玫瑰</div>
+                  <div class="brush-sub">題目：0.05 塊</div>
+                </div>
+              </div>
+              <span class="brush-count" id="cnt-B">已塗 0 格</span>
+            </button>
+
+            <button type="button" class="brush-btn" data-brush="W">
+              <div class="brush-left">
+                <div class="brush-ico" style="background: var(--c-white-bg)">🤍</div>
+                <div class="brush-info">
+                  <div class="brush-name">白玫瑰</div>
+                  <div class="brush-sub">題目：剩下的 0.20 塊</div>
+                </div>
+              </div>
+              <span class="brush-count" id="cnt-W">已塗 0 格</span>
+            </button>
+
+            <button type="button" class="brush-btn eraser-wide" data-brush=".">
+              <div class="brush-left">
+                <div class="brush-ico" style="background: #f1f5f9">🧹</div>
+                <div class="brush-info">
+                  <div class="brush-name">橡皮擦</div>
+                  <div class="brush-sub">清除格子恢復空白</div>
+                </div>
+              </div>
+              <span class="brush-count" id="cnt-empty">空白 100 格</span>
+            </button>
+          </div>
+
+          <div class="tool-row">
+            <button type="button" class="tool-btn" id="btnUndo" disabled>↩️ 復原</button>
+            <button type="button" class="tool-btn" id="btnFillWhite" disabled>🤍 空位補白</button>
+            <button type="button" class="tool-btn danger" id="btnClearAll">🗑️ 清空重畫</button>
+          </div>
+
+          <button type="button" class="submit-btn" id="btnCheck">✅ 檢查並送出給老師</button>
+        </section>
+
+        <div class="feedback-box" id="feedbackBox"></div>
+      </aside>
+
+      <section class="stage">
+        <div class="stage-top">
+          <div class="stage-banner" id="stageBanner">🖐️ 用手指在百格紙上點選或拖曳，塗出玫瑰花圃！</div>
+          <div class="stage-hint">小秘訣：每條 10 格＝0.1 塊・粗線為 5×5 輔助線</div>
+        </div>
+        <div class="board-wrap" id="boardWrap">
+          <div class="board-frame" id="boardFrame">
+            <div class="ruler-top" id="rulerTop"></div>
+            <div class="ruler-left" id="rulerLeft"></div>
+            <div class="garden-board show-roses" id="gardenBoard" aria-label="10乘10百格紙花圃"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 衝突確認彈窗 -->
+  <div class="modal-mask" id="conflictModal">
+    <div class="mbox">
+      <h3>⚠️ 座號已經在別組囉！</h3>
+      <p id="conflictMsg" style="font-size: 16px; font-weight: 700; color: #334155; line-height: 1.6"></p>
+      <div class="rowbtn">
+        <button type="button" class="btn ghost" id="btnConflictCancel">重選座號</button>
+        <button type="button" class="btn" id="btnConflictRejoin">📂 回到原組繼續</button>
+        <button type="button" class="btn danger" id="btnConflictReassign">🔀 確認改組</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 過關祝賀與作品命名彈窗 -->
+  <div class="modal-mask" id="winModal">
+    <div class="mbox">
+      <h3>🎉 太厲害了！花圃完全答對！</h3>
+      <p style="font-size: 15.5px; font-weight: 700; color: #334155">
+        你們的百格紙花圃已經即時傳送給老師，等一下老師可以投影展示給全班欣賞喔！
+      </p>
+      <div class="check-summary">
+        <div class="check-pill">🩶 灰玫瑰：0.25 塊（25 格）✅</div>
+        <div class="check-pill">🌹 紅玫瑰：0.5 塊（50 格）✅</div>
+        <div class="check-pill">💙 藍玫瑰：0.05 塊（5 格）✅</div>
+        <div class="check-pill">🤍 白玫瑰：0.20 塊（20 格）✅</div>
+      </div>
+
+      <div id="autoWhiteHint" style="display: none; background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 10px 12px">
+        <div style="font-size: 14px; font-weight: 800; color: #92400e; margin-bottom: 6px">
+          剩下的 20 格（0.20 塊）目前還是空白紙面，要不要一鍵種滿可愛的白玫瑰花呢？
+        </div>
+        <button type="button" class="btn ok" id="btnModalFillWhite" style="min-height: 38px; font-size: 14px">
+          🤍 一鍵在剩餘 20 格種滿白玫瑰
+        </button>
+      </div>
+
+      <div>
+        <label style="display: block; font-size: 14px; font-weight: 900; color: #1e3a8a; margin-bottom: 5px">
+          ✨ 幫這組花圃取個名字（選填，老師展示時會顯示）：
+        </label>
+        <input type="text" class="title-input" id="gardenTitleInput" maxlength="30" placeholder="例如：愛心玫瑰園、彩色城堡..." />
+        <div class="tag-row" style="margin-top: 7px">
+          <button type="button" class="preset-tag" data-tag="愛心玫瑰園">💖 愛心玫瑰園</button>
+          <button type="button" class="preset-tag" data-tag="幾何花毯">🔷 幾何花毯</button>
+          <button type="button" class="preset-tag" data-tag="夢幻城堡">🏰 夢幻城堡</button>
+          <button type="button" class="preset-tag" data-tag="彩虹花園">🌈 彩虹花園</button>
+        </div>
+      </div>
+
+      <div class="rowbtn">
+        <button type="button" class="btn ghost" id="btnWinKeepEdit">🎨 回去調整花樣設計</button>
+        <button type="button" class="btn ok" id="btnWinSaveTitle">💾 儲存作品名稱</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 清空確認彈窗 -->
+  <div class="modal-mask" id="clearModal">
+    <div class="mbox" style="max-width: 420px">
+      <h3>🗑️ 確定要清空整個花圃嗎？</h3>
+      <p style="font-size: 15.5px; font-weight: 700; color: #475569">清空後 100 格都會變回空白，但還可以馬上按「↩️ 復原」救回來。</p>
+      <div class="rowbtn">
+        <button type="button" class="btn ghost" id="btnClearCancel">取消</button>
+        <button type="button" class="btn danger" id="btnClearConfirm">確定清空</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 全螢幕說明彈窗 -->
+  <div class="modal-mask" id="fsModal">
+    <div class="mbox">
+      <h3>⛶ iPad 全螢幕操作小技巧</h3>
+      <div style="font-size: 16.5px; line-height: 1.7; color: #334155; font-weight: 700">
+        在 iPad Safari 操作時，可用這 2 個方法變成滿版全螢幕：<br /><br />
+        <b>方法一：</b>點網址列左邊的 <b>「大小 / AA」</b> → 選擇 <b>「隱藏工具列」</b>。<br /><br />
+        <b>方法二：</b>點右上角 <b>「分享 📤」</b> → 選擇 <b>「加入主畫面」</b>，打開就是滿版 APP！
+      </div>
+      <div class="rowbtn">
+        <button type="button" class="btn" id="btnCloseFsModal">我知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Code 彈窗 -->
+  <div class="modal-mask" id="qrModal">
+    <div class="mbox" style="align-items: center; text-align: center; max-width: 460px">
+      <h3>📱 掃描 QR Code 進入花圃操作頁</h3>
+      <div style="background: #fff; border: 3px solid #bfd4ea; border-radius: 18px; padding: 12px; display: inline-flex">
+        <img
+          src="qrcode.png"
+          alt="正方形玫瑰花圃 QR Code"
+          style="width: 260px; height: 260px; max-width: 65vw; display: block"
+          onerror="this.style.display='none'; document.getElementById('qrFallbackText').style.display='block';"
+        />
+        <div id="qrFallbackText" style="display: none; padding: 20px; font-weight: 800; color: #475569">
+          尚未產生 qrcode.png，請直接複製下方網址開啟
+        </div>
+      </div>
+      <div id="shareUrlBox" style="font-size: 14px; font-weight: 800; color: #1e3a5f; word-break: break-all"></div>
+      <div class="rowbtn" style="width: 100%; justify-content: center">
+        <button type="button" class="btn" id="btnCloseQrModal">關閉視窗</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://ppdgubracsneozahujxl.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_4_8Lj3idSkZ0z74V4AIpRA_qqyEicMd";
+    const API_URL = `${SUPABASE_URL}/functions/v1/rose-garden-403`;
+    const STORAGE_KEY = "rose_garden_403_v1_state";
+    const MAX_SEAT = 29;
+    const DEFAULT_GRID = ".".repeat(100);
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(() => {});
+    }
+
+    const $ = (id) => document.getElementById(id);
+
+    const state = {
+      groupKey: null,
+      groupNo: null,
+      seats: [],
+      grid: DEFAULT_GRID,
+      title: "",
+      isCompleted: false,
+      attempts: 0,
+      wrongAttempts: 0,
+      joinedOnCloud: false,
+      pendingSync: false,
+      offlineChecks: [],
+      localSeq: 0,
+      syncedSeq: 0,
+      conflictPrompted: false,
+      activeBrush: "G",
+      showRoses: true,
+      undoStack: [],
+      lobbyGroups: [],
+      pickedSeats: [],
+      pendingConflict: null,
+      cloudEnabled: true,
+    };
+
+    function makeOpId() {
+      if (window.crypto?.randomUUID) return `chk_${window.crypto.randomUUID()}`;
+      return `chk_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    }
+
+    /* ---- API 呼叫（含逾時控制防止弱網路卡死） ---- */
+    async function apiCall(payload, timeoutMs = 6000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            apikey: SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const msg = data?.error || `HTTP ${res.status}`;
+          const err = new Error(msg);
+          err.status = res.status;
+          throw err;
+        }
+        return data;
+      } catch (err) {
+        if (err?.name === "AbortError") {
+          const tErr = new Error("連線逾時");
+          tErr.isTimeout = true;
+          throw tErr;
+        }
+        throw err;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    function setSyncUI(mode, text) {
+      const b = $("syncBadge");
+      b.className = "sync-badge" + (mode === "saving" ? " saving" : mode === "err" ? " err" : "");
+      b.textContent = text;
+    }
+
+    function saveLocal() {
+      try {
+        if (!state.groupKey) {
+          localStorage.removeItem(STORAGE_KEY);
+          return;
+        }
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            groupKey: state.groupKey,
+            groupNo: state.groupNo,
+            seats: state.seats,
+            grid: state.grid,
+            title: state.title,
+            isCompleted: state.isCompleted,
+            attempts: state.attempts,
+            wrongAttempts: state.wrongAttempts,
+            joinedOnCloud: state.joinedOnCloud,
+            pendingSync: state.pendingSync,
+            offlineChecks: state.offlineChecks,
+            localSeq: state.localSeq,
+            syncedSeq: state.syncedSeq,
+            updatedAt: Date.now(),
+          })
+        );
+      } catch {}
+    }
+
+    function readLocal() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+
+    /* ---- 棋盤格統計與在地評分（離線保底） ---- */
+    function countGrid(grid) {
+      let G = 0;
+      let R = 0;
+      let B = 0;
+      let W = 0;
+      let empty = 0;
+      for (let i = 0; i < grid.length; i++) {
+        const ch = grid[i];
+        if (ch === "G") G++;
+        else if (ch === "R") R++;
+        else if (ch === "B") B++;
+        else if (ch === "W") W++;
+        else empty++;
+      }
+      return { G, R, B, W, empty, painted: G + R + B + W };
+    }
+
+    function evaluateLocal(grid, attemptsAfter) {
+      const counts = countGrid(grid);
+      const grayOk = counts.G === 25;
+      const redOk = counts.R === 50;
+      const blueOk = counts.B === 5;
+      const baseMatch = grayOk && redOk && blueOk;
+      const passed = baseMatch && counts.W + counts.empty === 20;
+
+      let hint = "";
+      if (passed) {
+        hint = "🎉 太棒了！0.25 灰玫瑰、0.5 紅玫瑰、0.05 藍玫瑰、0.20 白玫瑰全部完美符合！";
+      } else if (counts.painted === 0) {
+        hint = "先選一種玫瑰顏色，在百格紙上點選或拖曳上色喔！";
+      } else if (counts.R === 5) {
+        hint = "💡 紅玫瑰是「0.5 塊」，不是「0.05 塊」喔！想一想：1 條 10 格是 0.1 塊，0.5 塊要塗幾條呢？";
+      } else if (counts.B === 50) {
+        hint = "💡 藍玫瑰是「0.05 塊」，不是「0.5 塊」喔！0.05 只有幾個 0.01（小格）呢？";
+      } else if (counts.W > 20) {
+        hint = "💡 白玫瑰是「剩下的 0.20 塊」，現在塗超過囉！先檢查灰、紅、藍各塗了幾格吧。";
+      } else {
+        const wrong = [];
+        if (!grayOk) wrong.push("灰玫瑰（0.25 塊）");
+        if (!redOk) wrong.push("紅玫瑰（0.5 塊）");
+        if (!blueOk) wrong.push("藍玫瑰（0.05 塊）");
+        if (wrong.length > 0) {
+          hint =
+            attemptsAfter >= 2
+              ? `🔍 提示：1 大格代表 1 塊，共有 100 小格，每小格是 0.01 塊、1 整條 10 格是 0.1 塊！請再檢查：${wrong.join("、")}。`
+              : `🔍 還差一點點！請再點數確認：${wrong.join("、")} 的格數是不是剛好喔！`;
+        } else {
+          hint = "🔍 再檢查一下各顏色合起來有沒有剛好是整塊花圃（100 格）喔！";
+        }
+      }
+      return { passed, counts, hint };
+    }
+
+    /* ---- 百格紙 DOM 與大小計算 ---- */
+    const cells = [];
+    function initBoard() {
+      const topR = $("rulerTop");
+      const leftR = $("rulerLeft");
+      const board = $("gardenBoard");
+      topR.innerHTML = Array.from({ length: 10 }, (_, i) => `<span>${i + 1}</span>`).join("");
+      leftR.innerHTML = Array.from({ length: 10 }, (_, i) => `<span>${i + 1}</span>`).join("");
+
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < 100; i++) {
+        const div = document.createElement("div");
+        div.className = "cell";
+        div.dataset.idx = String(i);
+        div.dataset.row = String(Math.floor(i / 10));
+        div.dataset.col = String(i % 10);
+        div.dataset.c = ".";
+        cells.push(div);
+        frag.appendChild(div);
+      }
+      board.appendChild(frag);
+      resizeBoard();
+    }
+
+    function resizeBoard() {
+      const wrap = $("boardWrap");
+      const board = $("gardenBoard");
+      const rect = wrap.getBoundingClientRect();
+      const availW = Math.max(200, rect.width - 30);
+      const availH = Math.max(200, rect.height - 28);
+      const size = Math.max(200, Math.floor(Math.min(availW, availH) / 10) * 10);
+      board.style.width = `${size}px`;
+      board.style.height = `${size}px`;
+    }
+
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(resizeBoard).observe($("boardWrap"));
+    }
+    window.addEventListener("resize", resizeBoard);
+
+    function renderGrid() {
+      const g = state.grid;
+      for (let i = 0; i < 100; i++) {
+        const ch = g[i] || ".";
+        if (cells[i].dataset.c !== ch) {
+          cells[i].dataset.c = ch;
+        }
+      }
+      updateCountsUI();
+    }
+
+    function updateCountsUI() {
+      const c = countGrid(state.grid);
+      $("cnt-G").textContent = `已塗 ${c.G} 格`;
+      $("cnt-R").textContent = `已塗 ${c.R} 格`;
+      $("cnt-B").textContent = `已塗 ${c.B} 格`;
+      $("cnt-W").textContent = `已塗 ${c.W} 格`;
+      $("cnt-empty").textContent = `空白 ${c.empty} 格`;
+      $("totalBadge").textContent = `已塗 ${c.painted} / 100 格`;
+      $("btnUndo").disabled = state.undoStack.length === 0;
+      $("btnFillWhite").disabled = c.empty === 0 || c.empty === 100;
+
+      const checkBtn = $("btnCheck");
+      const banner = $("stageBanner");
+      if (state.isCompleted) {
+        checkBtn.classList.add("done");
+        checkBtn.textContent = "💾 更新並儲存展示作品";
+        banner.className = "stage-banner done";
+        banner.textContent = `✅ 已完成達標！${state.title ? `作品：《${state.title}》` : "可繼續美化花圃圖案再更新給老師"}`;
+      } else {
+        checkBtn.classList.remove("done");
+        checkBtn.textContent = "✅ 檢查並送出給老師";
+        banner.className = "stage-banner";
+        banner.textContent = "🖐️ 用手指在百格紙上點選或拖曳，塗出玫瑰花圃！";
+      }
+    }
+
+    function formatSeatsText(seats) {
+      return seats.map((s) => `${String(s).padStart(2, "0")}號`).join("・");
+    }
+
+    function updateGroupHeader() {
+      if (!state.groupKey) {
+        $("groupLabel").textContent = "尚未選組員";
+        return;
+      }
+      const noTxt = state.groupNo ? `第 ${state.groupNo} 組｜` : "";
+      $("groupLabel").textContent = `${noTxt}${formatSeatsText(state.seats)}`;
+    }
+
+    /* ---- 雲端自動同步（斷線離線暫存 + 冪等補傳 + 退避重試） ---- */
+    let saveTimer = 0;
+    let retryTimer = 0;
+    let consecutiveFailures = 0;
+    let syncChain = Promise.resolve();
+    let flushQueued = false;
+
+    function clearRetryTimer() {
+      if (retryTimer) {
+        clearTimeout(retryTimer);
+        retryTimer = 0;
+      }
+    }
+
+    function scheduleRetry(customMs) {
+      clearRetryTimer();
+      if (!state.groupKey) return;
+      if (!state.pendingSync && state.joinedOnCloud && state.offlineChecks.length === 0) return;
+      const baseDelay =
+        typeof customMs === "number"
+          ? customMs
+          : Math.min(10000, 2000 * Math.pow(1.6, Math.min(consecutiveFailures, 4)));
+      const jitter = Math.floor(Math.random() * 550);
+      retryTimer = setTimeout(() => {
+        retryTimer = 0;
+        if (state.groupKey && (state.pendingSync || !state.joinedOnCloud || state.offlineChecks.length > 0)) {
+          flushSync();
+        }
+      }, baseDelay + jitter);
+    }
+
+    function markLocalDirty() {
+      state.localSeq += 1;
+      state.pendingSync = true;
+      saveLocal();
+    }
+
+    function scheduleSync(immediate = false) {
+      markLocalDirty();
+      if (!state.groupKey) return;
+      setSyncUI("saving", navigator.onLine === false ? "📡 離線暫存中" : "⏳ 同步中...");
+      clearTimeout(saveTimer);
+      clearRetryTimer();
+      if (immediate) {
+        flushSync();
+      } else {
+        saveTimer = setTimeout(flushSync, 550);
+      }
+    }
+
+    function handleGroupResetByTeacher() {
+      state.groupKey = null;
+      state.groupNo = null;
+      state.joinedOnCloud = false;
+      state.pendingSync = false;
+      state.offlineChecks = [];
+      state.localSeq = 0;
+      state.syncedSeq = 0;
+      state.conflictPrompted = false;
+      clearTimeout(saveTimer);
+      clearRetryTimer();
+      saveLocal();
+      updateGroupHeader();
+      setSyncUI("err", "⚠️ 請重新選座號");
+      alert("⚠️ 這組的紀錄已被老師清空或重設，請重新點選組員座號登入！");
+      openLoginOverlay();
+    }
+
+    function showConflictModal(seats, conflicts) {
+      state.pendingConflict = { seats, conflicts: conflicts || [] };
+      const c0 = conflicts?.[0];
+      if (!c0) return;
+      const overlapTxt = (c0.overlapping_seats || []).map((s) => `${s} 號`).join("、");
+      $("conflictMsg").innerHTML =
+        `<b>${overlapTxt}</b> 目前已經在 <b>「第 ${c0.group_no} 組（${formatSeatsText(c0.seats)}）」</b> 中作答囉！<br><br>請問你們是要回到原本那組繼續，還是重新分組？`;
+      $("conflictModal").classList.add("show");
+    }
+
+    async function syncStep() {
+      if (!state.groupKey) return;
+      if (!state.pendingSync && state.joinedOnCloud && state.offlineChecks.length === 0) return;
+
+      if (navigator.onLine === false) {
+        const cnt = state.offlineChecks.length;
+        setSyncUI("err", cnt > 0 ? `📡 離線暫存 (${cnt})` : "📡 離線暫存中");
+        scheduleRetry(4000);
+        return;
+      }
+
+      try {
+        // 若當初是離線開始作答，恢復連線後先自動完成雲端建組
+        if (!state.joinedOnCloud) {
+          const joinRes = await apiCall(
+            {
+              action: "join",
+              seats: state.seats,
+              force_reassign: false,
+            },
+            7000
+          );
+
+          if (joinRes.status === "conflict") {
+            if (!state.conflictPrompted) {
+              state.conflictPrompted = true;
+              showConflictModal(state.seats, joinRes.conflicts || []);
+            }
+            setSyncUI("err", "⚠️ 座號衝突");
+            return;
+          }
+
+          if (joinRes.group) {
+            state.joinedOnCloud = true;
+            state.groupKey = joinRes.group.group_key;
+            state.groupNo = joinRes.group.group_no;
+            state.conflictPrompted = false;
+            updateGroupHeader();
+
+            // 若剛離線進入且尚未做任何修改，直接採用雲端既有畫作
+            if (
+              joinRes.restored &&
+              state.localSeq === 0 &&
+              countGrid(state.grid).painted === 0 &&
+              !state.title &&
+              state.offlineChecks.length === 0
+            ) {
+              applyJoinedGroup(joinRes.group);
+              return;
+            }
+            saveLocal();
+          }
+        }
+
+        const targetKey = state.groupKey;
+        const targetGrid = state.grid;
+        const targetTitle = state.title;
+        const seqAtSend = state.localSeq;
+        const checksSnapshot = state.offlineChecks.slice();
+
+        if (checksSnapshot.length > 0) {
+          const syncRes = await apiCall(
+            {
+              action: "sync_offline",
+              group_key: targetKey,
+              checks: checksSnapshot,
+              grid: targetGrid,
+              title: targetTitle,
+            },
+            8000
+          );
+
+          const syncedIds = new Set(checksSnapshot.map((c) => c.op_id));
+          state.offlineChecks = state.offlineChecks.filter((c) => !syncedIds.has(c.op_id));
+
+          if (syncRes?.group) {
+            state.attempts = Number(syncRes.group.attempts || 0);
+            state.wrongAttempts = Number(syncRes.group.wrong_attempts || 0);
+            if (state.localSeq === seqAtSend && state.offlineChecks.length === 0) {
+              state.isCompleted = Boolean(syncRes.group.is_completed);
+              state.syncedSeq = seqAtSend;
+              state.pendingSync = false;
+              consecutiveFailures = 0;
+              clearRetryTimer();
+              setSyncUI("ok", "☁️ 已恢復連線同步");
+              updateCountsUI();
+            } else {
+              state.pendingSync = true;
+              consecutiveFailures = 0;
+              scheduleRetry(300);
+            }
+          }
+          state.cloudEnabled = true;
+          saveLocal();
+          return;
+        }
+
+        const res = await apiCall(
+          {
+            action: "save",
+            group_key: targetKey,
+            grid: targetGrid,
+            title: targetTitle,
+          },
+          6000
+        );
+
+        if (res?.group && state.localSeq === seqAtSend) {
+          state.isCompleted = Boolean(res.group.is_completed);
+          state.attempts = Number(res.group.attempts ?? state.attempts);
+          state.wrongAttempts = Number(res.group.wrong_attempts ?? state.wrongAttempts);
+          updateCountsUI();
+        }
+        if (state.localSeq === seqAtSend && state.offlineChecks.length === 0) {
+          state.syncedSeq = seqAtSend;
+          state.pendingSync = false;
+          consecutiveFailures = 0;
+          clearRetryTimer();
+          setSyncUI("ok", "☁️ 已同步給老師");
+        } else {
+          state.pendingSync = true;
+          consecutiveFailures = 0;
+          scheduleRetry(300);
+        }
+        state.cloudEnabled = true;
+        saveLocal();
+      } catch (err) {
+        if (err.status === 404 && String(err.message).includes("group_not_active") && state.joinedOnCloud) {
+          handleGroupResetByTeacher();
+          return;
+        }
+        if (err.status === 409) {
+          consecutiveFailures += 1;
+          setSyncUI("err", "⚠️ 已滿15組(本機存)");
+          scheduleRetry(8000);
+          return;
+        }
+        consecutiveFailures += 1;
+        state.cloudEnabled = false;
+        const cnt = state.offlineChecks.length;
+        setSyncUI("err", cnt > 0 ? `📡 離線暫存 (${cnt})` : "📡 離線暫存中");
+        scheduleRetry();
+      }
+    }
+
+    function flushSync() {
+      if (!state.groupKey) return syncChain;
+      if (flushQueued) return syncChain;
+      flushQueued = true;
+      syncChain = syncChain.then(async () => {
+        flushQueued = false;
+        await syncStep();
+      });
+      return syncChain;
+    }
+
+    function triggerReconnectSync() {
+      if (!state.groupKey) return;
+      if (state.pendingSync || !state.joinedOnCloud || state.offlineChecks.length > 0) {
+        consecutiveFailures = 0;
+        clearRetryTimer();
+        flushSync();
+      }
+    }
+
+    setInterval(() => {
+      if (state.groupKey && (state.pendingSync || !state.joinedOnCloud || state.offlineChecks.length > 0)) {
+        flushSync();
+      }
+    }, 5000);
+
+    window.addEventListener("online", triggerReconnectSync);
+    window.addEventListener("focus", triggerReconnectSync);
+    window.addEventListener("pageshow", triggerReconnectSync);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        triggerReconnectSync();
+      } else {
+        saveLocal();
+      }
+    });
+    window.addEventListener("offline", () => {
+      if (!state.groupKey) return;
+      const cnt = state.offlineChecks.length;
+      setSyncUI("err", cnt > 0 ? `📡 離線暫存 (${cnt})` : "📡 離線暫存中");
+    });
+    window.addEventListener("pagehide", () => {
+      saveLocal();
+      if (
+        state.groupKey &&
+        state.joinedOnCloud &&
+        state.pendingSync &&
+        state.offlineChecks.length === 0 &&
+        navigator.onLine !== false
+      ) {
+        try {
+          fetch(API_URL, {
+            method: "POST",
+            keepalive: true,
+            headers: {
+              apikey: SUPABASE_PUBLISHABLE_KEY,
+              Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              action: "save",
+              group_key: state.groupKey,
+              grid: state.grid,
+              title: state.title,
+            }),
+          }).catch(() => {});
+        } catch {}
+      }
+    });
+    $("syncBadge").addEventListener("click", () => {
+      if (state.groupKey) {
+        if (!state.joinedOnCloud) state.conflictPrompted = false;
+        consecutiveFailures = 0;
+        clearRetryTimer();
+        setSyncUI("saving", "⏳ 同步中...");
+        flushSync();
+      }
+    });
+
+    /* ---- 觸控滑動畫格（含 Bresenham 直線補點防跳格） ---- */
+    function setGridChar(idx, ch) {
+      if (idx < 0 || idx >= 100) return false;
+      if (state.grid[idx] === ch) return false;
+      state.grid = state.grid.slice(0, idx) + ch + state.grid.slice(idx + 1);
+      cells[idx].dataset.c = ch;
+      return true;
+    }
+
+    function paintLine(r0, c0, r1, c1, ch) {
+      let changed = false;
+      let dr = Math.abs(r1 - r0);
+      let dc = Math.abs(c1 - c0);
+      let sr = r0 < r1 ? 1 : -1;
+      let sc = c0 < c1 ? 1 : -1;
+      let err = dr - dc;
+      let r = r0;
+      let c = c0;
+      while (true) {
+        if (setGridChar(r * 10 + c, ch)) changed = true;
+        if (r === r1 && c === c1) break;
+        const e2 = 2 * err;
+        if (e2 > -dc) {
+          err -= dc;
+          r += sr;
+        }
+        if (e2 < dr) {
+          err += dr;
+          c += sc;
+        }
+      }
+      return changed;
+    }
+
+    function cellAtPointer(clientX, clientY) {
+      const rect = $("gardenBoard").getBoundingClientRect();
+      if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
+        return null;
+      }
+      const c = Math.max(0, Math.min(9, Math.floor(((clientX - rect.left) / rect.width) * 10)));
+      const r = Math.max(0, Math.min(9, Math.floor(((clientY - rect.top) / rect.height) * 10)));
+      return { r, c, idx: r * 10 + c };
+    }
+
+    (function bindBoardTouch() {
+      const board = $("gardenBoard");
+      let drawing = false;
+      let pointerId = -1;
+      let snapshot = "";
+      let startCell = null;
+      let lastCell = null;
+      let movedOther = false;
+      let wasSameColor = false;
+      let mutated = false;
+
+      board.addEventListener("touchstart", (e) => e.cancelable && e.preventDefault(), { passive: false });
+      board.addEventListener("touchmove", (e) => e.cancelable && e.preventDefault(), { passive: false });
+
+      board.addEventListener("pointerdown", (e) => {
+        if (!e.isPrimary) return;
+        if (e.cancelable) e.preventDefault();
+        const hit = cellAtPointer(e.clientX, e.clientY);
+        if (!hit) return;
+
+        drawing = true;
+        pointerId = e.pointerId;
+        try {
+          board.setPointerCapture(pointerId);
+        } catch {}
+
+        snapshot = state.grid;
+        startCell = hit;
+        lastCell = hit;
+        movedOther = false;
+        wasSameColor = state.grid[hit.idx] === state.activeBrush;
+        mutated = false;
+
+        if (!wasSameColor) {
+          mutated = setGridChar(hit.idx, state.activeBrush);
+          if (mutated) {
+            updateCountsUI();
+          }
+        }
+      });
+
+      board.addEventListener("pointermove", (e) => {
+        if (!drawing || e.pointerId !== pointerId) return;
+        if (e.cancelable) e.preventDefault();
+        const hit = cellAtPointer(e.clientX, e.clientY);
+        if (!hit) return;
+        if (hit.idx !== lastCell.idx) {
+          movedOther = true;
+          if (paintLine(lastCell.r, lastCell.c, hit.r, hit.c, state.activeBrush)) {
+            mutated = true;
+            updateCountsUI();
+          }
+          lastCell = hit;
+        }
+      });
+
+      const endStroke = (e) => {
+        if (!drawing || e.pointerId !== pointerId) return;
+        drawing = false;
+        pointerId = -1;
+
+        if (!movedOther && wasSameColor && state.activeBrush !== ".") {
+          if (setGridChar(startCell.idx, ".")) {
+            mutated = true;
+          }
+        }
+
+        if (mutated) {
+          state.undoStack.push(snapshot);
+          if (state.undoStack.length > 40) state.undoStack.shift();
+          // 若原本已通關，在編輯後即時重算本地狀態
+          if (state.isCompleted) {
+            state.isCompleted = evaluateLocal(state.grid, state.attempts).passed;
+          }
+          hideFeedback();
+          updateCountsUI();
+          scheduleSync(false);
+        }
+      };
+
+      board.addEventListener("pointerup", endStroke);
+      board.addEventListener("pointercancel", endStroke);
+    })();
+
+    // 禁止背景頁面橡皮筋滾動或雙指縮放
+    document.addEventListener(
+      "touchmove",
+      (e) => {
+        if (!e.target.closest(".seat-grid-wrap, .sidebar, .mbox")) {
+          if (e.cancelable) e.preventDefault();
+        }
+      },
+      { passive: false }
+    );
+    ["gesturestart", "gesturechange", "gestureend"].forEach((ev) => {
+      document.addEventListener(ev, (e) => e.cancelable && e.preventDefault(), { passive: false });
+    });
+
+    /* ---- 工具列動作 ---- */
+    $("brushList").querySelectorAll("[data-brush]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.activeBrush = btn.dataset.brush;
+        $("brushList").querySelectorAll("[data-brush]").forEach((b) => {
+          b.classList.toggle("active", b === btn);
+        });
+      });
+    });
+
+    $("btnUndo").addEventListener("click", () => {
+      if (state.undoStack.length === 0) return;
+      state.grid = state.undoStack.pop();
+      if (state.isCompleted) {
+        state.isCompleted = evaluateLocal(state.grid, state.attempts).passed;
+      }
+      renderGrid();
+      hideFeedback();
+      scheduleSync(false);
+    });
+
+    $("btnFillWhite").addEventListener("click", () => {
+      const prev = state.grid;
+      const next = state.grid.replace(/\./g, "W");
+      if (next === prev) return;
+      state.undoStack.push(prev);
+      state.grid = next;
+      renderGrid();
+      hideFeedback();
+      scheduleSync(false);
+    });
+
+    $("btnClearAll").addEventListener("click", () => {
+      $("clearModal").classList.add("show");
+    });
+    $("btnClearCancel").addEventListener("click", () => $("clearModal").classList.remove("show"));
+    $("btnClearConfirm").addEventListener("click", () => {
+      $("clearModal").classList.remove("show");
+      if (state.grid === DEFAULT_GRID) return;
+      state.undoStack.push(state.grid);
+      state.grid = DEFAULT_GRID;
+      state.isCompleted = false;
+      renderGrid();
+      hideFeedback();
+      scheduleSync(true);
+    });
+
+    $("btnStyleMode").addEventListener("click", () => {
+      state.showRoses = !state.showRoses;
+      $("gardenBoard").classList.toggle("show-roses", state.showRoses);
+      $("btnStyleMode").classList.toggle("active", state.showRoses);
+      $("btnStyleMode").textContent = state.showRoses ? "🌹 玫瑰花模式" : "🎨 純色塊模式";
+    });
+
+    /* ---- 檢查與送出 ---- */
+    function showFeedback(kind, msg) {
+      const box = $("feedbackBox");
+      box.className = `feedback-box show ${kind}`;
+      box.textContent = msg;
+      box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      const banner = $("stageBanner");
+      if (kind === "warn") {
+        banner.className = "stage-banner";
+        banner.style.background = "#fff7ed";
+        banner.style.borderColor = "#fdba74";
+        banner.style.color = "#9a3412";
+        banner.textContent = msg;
+      } else {
+        banner.style.background = "";
+        banner.style.borderColor = "";
+        banner.style.color = "";
+      }
+    }
+    function hideFeedback() {
+      $("feedbackBox").classList.remove("show");
+      const banner = $("stageBanner");
+      banner.style.background = "";
+      banner.style.borderColor = "";
+      banner.style.color = "";
+      updateCountsUI();
+    }
+
+    $("btnCheck").addEventListener("click", async () => {
+      if (!state.groupKey) {
+        openLoginOverlay();
+        return;
+      }
+      const btn = $("btnCheck");
+      btn.disabled = true;
+      btn.textContent = "⏳ 檢查中...";
+      clearTimeout(saveTimer);
+      clearRetryTimer();
+
+      const opId = makeOpId();
+      const checkGrid = state.grid;
+      const checkTitle = state.title;
+      const seqAtCheck = state.localSeq;
+
+      const queueOfflineCheck = (badgeText) => {
+        state.attempts += 1;
+        const localEval = evaluateLocal(checkGrid, state.attempts);
+        if (!localEval.passed) state.wrongAttempts += 1;
+        state.isCompleted = localEval.passed;
+        state.offlineChecks.push({
+          op_id: opId,
+          grid: checkGrid,
+          title: checkTitle,
+          queued_at: new Date().toISOString(),
+        });
+        if (state.offlineChecks.length > 50) {
+          state.offlineChecks = state.offlineChecks.slice(-50);
+        }
+        state.pendingSync = true;
+        saveLocal();
+        setSyncUI("err", badgeText || `📡 離線暫存 (${state.offlineChecks.length})`);
+        scheduleRetry(3000);
+        return {
+          passed: localEval.passed,
+          counts: localEval.counts,
+          hint: localEval.hint,
+          offline: true,
+        };
+      };
+
+      let resData = null;
+      try {
+        await syncChain;
+        if (!state.groupKey) return;
+
+        if (navigator.onLine === false) {
+          resData = queueOfflineCheck();
+        } else if (!state.joinedOnCloud || state.offlineChecks.length > 0) {
+          resData = queueOfflineCheck("⏳ 同步離線紀錄...");
+          await flushSync();
+          if (!state.groupKey) return;
+          if (state.joinedOnCloud && state.offlineChecks.length === 0) {
+            resData.offline = false;
+            setSyncUI("ok", "☁️ 已送出同步");
+          } else {
+            setSyncUI("err", `📡 離線暫存 (${state.offlineChecks.length})`);
+          }
+        } else {
+          try {
+            resData = await apiCall(
+              {
+                action: "check",
+                group_key: state.groupKey,
+                grid: checkGrid,
+                title: checkTitle,
+                op_id: opId,
+              },
+              6500
+            );
+            state.cloudEnabled = true;
+            if (resData?.group) {
+              state.attempts = Number(resData.group.attempts || 0);
+              state.wrongAttempts = Number(resData.group.wrong_attempts || 0);
+              if (state.localSeq === seqAtCheck && state.offlineChecks.length === 0) {
+                state.isCompleted = Boolean(resData.group.is_completed);
+                state.syncedSeq = seqAtCheck;
+                state.pendingSync = false;
+                consecutiveFailures = 0;
+                clearRetryTimer();
+                setSyncUI("ok", "☁️ 已送出同步");
+              } else {
+                state.isCompleted = evaluateLocal(state.grid, state.attempts).passed;
+                state.pendingSync = true;
+                scheduleSync(false);
+              }
+            }
+          } catch (err) {
+            if (err.status === 404 && String(err.message).includes("group_not_active") && state.joinedOnCloud) {
+              btn.disabled = false;
+              updateCountsUI();
+              handleGroupResetByTeacher();
+              return;
+            }
+            resData = queueOfflineCheck("📡 離線暫存（自動補傳）");
+          }
+        }
+      } finally {
+        btn.disabled = false;
+        saveLocal();
+        updateCountsUI();
+      }
+
+      if (!resData) return;
+      if (resData.passed) {
+        showFeedback("ok", resData.hint);
+        const c = countGrid(state.grid);
+        $("autoWhiteHint").style.display = c.empty > 0 ? "block" : "none";
+        $("gardenTitleInput").value = state.title || "";
+        $("winModal").classList.add("show");
+      } else {
+        showFeedback("warn", resData.hint);
+      }
+    });
+
+    $("btnModalFillWhite").addEventListener("click", () => {
+      state.undoStack.push(state.grid);
+      state.grid = state.grid.replace(/\./g, "W");
+      renderGrid();
+      $("autoWhiteHint").style.display = "none";
+      scheduleSync(true);
+    });
+
+    $("winModal").querySelectorAll("[data-tag]").forEach((tagBtn) => {
+      tagBtn.addEventListener("click", () => {
+        $("gardenTitleInput").value = tagBtn.dataset.tag;
+      });
+    });
+
+    $("btnWinKeepEdit").addEventListener("click", () => {
+      $("winModal").classList.remove("show");
+    });
+
+    $("btnWinSaveTitle").addEventListener("click", () => {
+      state.title = $("gardenTitleInput").value.trim().slice(0, 30);
+      $("winModal").classList.remove("show");
+      updateCountsUI();
+      scheduleSync(true);
+    });
+
+    /* ---- 全螢幕與 QR ---- */
+    const isFs = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+    function updateFsBtn() {
+      const on = isFs();
+      $("btnFs").textContent = on ? "🗗 退出" : "⛶ 全螢幕";
+      $("btnFs").classList.toggle("active", on);
+    }
+    $("btnFs").addEventListener("click", () => {
+      const el = document.documentElement;
+      const req = el.requestFullscreen || el.webkitRequestFullscreen;
+      const ex = document.exitFullscreen || document.webkitExitFullscreen;
+      if (isFs()) {
+        if (ex) Promise.resolve(ex.call(document)).catch(() => {});
+      } else if (req) {
+        Promise.resolve(req.call(el))
+          .then(updateFsBtn)
+          .catch(() => $("fsModal").classList.add("show"));
+      } else {
+        $("fsModal").classList.add("show");
+      }
+    });
+    document.addEventListener("fullscreenchange", updateFsBtn);
+    document.addEventListener("webkitfullscreenchange", updateFsBtn);
+    $("btnCloseFsModal").addEventListener("click", () => $("fsModal").classList.remove("show"));
+
+    $("btnQr").addEventListener("click", () => {
+      $("shareUrlBox").textContent = window.location.href.split("?")[0];
+      $("qrModal").classList.add("show");
+    });
+    $("btnCloseQrModal").addEventListener("click", () => $("qrModal").classList.remove("show"));
+    $("qrModal").addEventListener("click", (e) => {
+      if (e.target === $("qrModal")) $("qrModal").classList.remove("show");
+    });
+
+    /* ---- 登入與 1~29 號組員選擇 ---- */
+    function seatOwnerMap() {
+      const map = new Map();
+      state.lobbyGroups.forEach((g) => {
+        (g.seats || []).forEach((s) => map.set(Number(s), g));
+      });
+      return map;
+    }
+
+    function renderLoginUI() {
+      const owners = seatOwnerMap();
+      const seatGrid = $("seatGrid");
+      let html = "";
+      for (let n = 1; n <= MAX_SEAT; n++) {
+        const picked = state.pickedSeats.includes(n);
+        const owner = owners.get(n);
+        const sub = owner ? `第${owner.group_no}組` : "";
+        html += `<button type="button" class="seat-btn ${picked ? "picked" : ""} ${owner ? "occupied" : ""}" data-seat="${n}">
+          <span>${n} 號</span>
+          ${sub ? `<span class="sub">${sub}</span>` : ""}
+        </button>`;
+      }
+      seatGrid.innerHTML = html;
+      seatGrid.querySelectorAll("[data-seat]").forEach((b) => {
+        b.addEventListener("click", () => toggleSeatPick(Number(b.dataset.seat)));
+      });
+
+      const chipsEl = $("selectedChips");
+      if (state.pickedSeats.length === 0) {
+        chipsEl.innerHTML = "<span>尚未選擇組員座號（請點選 1～2 位）</span>";
+      } else {
+        chipsEl.innerHTML =
+          "<span>已選組員：</span>" +
+          state.pickedSeats
+            .map(
+              (s) =>
+                `<button type="button" class="sel-chip" data-unpick="${s}">${String(s).padStart(2, "0")} 號 ✕</button>`
+            )
+            .join("");
+        chipsEl.querySelectorAll("[data-unpick]").forEach((b) => {
+          b.addEventListener("click", () => toggleSeatPick(Number(b.dataset.unpick)));
+        });
+      }
+
+      const lobbyStat = $("lobbyStat");
+      if (state.cloudEnabled) {
+        lobbyStat.className = "lobby-stat";
+        lobbyStat.textContent = `線上組數：${state.lobbyGroups.length} / 15 組`;
+      } else {
+        lobbyStat.className = "lobby-stat offline";
+        lobbyStat.textContent = "離線模式（可先選座號開始）";
+      }
+
+      const startBtn = $("btnStartGroup");
+      if (state.pickedSeats.length === 0) {
+        startBtn.disabled = true;
+        startBtn.textContent = "請先點選組員座號";
+      } else {
+        startBtn.disabled = false;
+        startBtn.textContent = `🚀 開始種玫瑰花圃（${formatSeatsText(state.pickedSeats)}）`;
+      }
+
+      const activeBar = $("activeGroupsBar");
+      if (state.lobbyGroups.length > 0) {
+        activeBar.style.display = "flex";
+        activeBar.innerHTML =
+          `<span>快速回到已登入組別：</span>` +
+          state.lobbyGroups
+            .map(
+              (g) =>
+                `<button type="button" class="quick-grp-chip ${g.is_completed ? "done" : ""}" data-rejoin="${g.group_key}">第${g.group_no}組 (${g.seats.join("・")})${g.is_completed ? " ✅" : ""}</button>`
+            )
+            .join("");
+        activeBar.querySelectorAll("[data-rejoin]").forEach((b) => {
+          b.addEventListener("click", () => {
+            const grp = state.lobbyGroups.find((x) => x.group_key === b.dataset.rejoin);
+            if (grp) {
+              state.pickedSeats = [...grp.seats];
+              joinGroup(state.pickedSeats, false);
+            }
+          });
+        });
+      } else {
+        activeBar.style.display = "none";
+      }
+    }
+
+    function toggleSeatPick(seat) {
+      const idx = state.pickedSeats.indexOf(seat);
+      if (idx >= 0) {
+        state.pickedSeats.splice(idx, 1);
+      } else {
+        if (state.pickedSeats.length >= 3) {
+          state.pickedSeats.shift();
+        }
+        state.pickedSeats.push(seat);
+        state.pickedSeats.sort((a, b) => a - b);
+      }
+      renderLoginUI();
+    }
+
+    async function refreshLobby() {
+      if (navigator.onLine === false) {
+        state.lobbyGroups = [];
+        state.cloudEnabled = false;
+        renderLoginUI();
+        return;
+      }
+      try {
+        const res = await apiCall({ action: "lobby" }, 4500);
+        state.lobbyGroups = res.groups || [];
+        state.cloudEnabled = true;
+      } catch (err) {
+        state.lobbyGroups = [];
+        state.cloudEnabled = false;
+      }
+      renderLoginUI();
+    }
+
+    function applyJoinedGroup(group, options = {}) {
+      state.groupKey = group.group_key;
+      state.groupNo = group.group_no;
+      state.seats = group.seats;
+      state.grid = typeof group.grid === "string" && group.grid.length === 100 ? group.grid : DEFAULT_GRID;
+      state.title = group.title || "";
+      state.isCompleted = Boolean(group.is_completed);
+      state.attempts = Number(group.attempts || 0);
+      state.wrongAttempts = Number(group.wrong_attempts || 0);
+      state.joinedOnCloud = options.joinedOnCloud !== undefined ? options.joinedOnCloud : true;
+      state.pendingSync = Boolean(options.pendingSync);
+      state.offlineChecks = Array.isArray(options.offlineChecks) ? options.offlineChecks : [];
+      state.localSeq = Number(options.localSeq || 0);
+      state.syncedSeq = Number(options.syncedSeq || 0);
+      state.conflictPrompted = false;
+      state.undoStack = [];
+      saveLocal();
+      updateGroupHeader();
+      renderGrid();
+      hideFeedback();
+      $("loginOverlay").classList.add("hidden");
+      if (options.syncText) {
+        setSyncUI(options.syncMode || "ok", options.syncText);
+      } else {
+        setSyncUI("ok", "☁️ 已連線同步");
+      }
+      resizeBoard();
+    }
+
+    async function joinGroup(seats, forceReassign = false) {
+      const btn = $("btnStartGroup");
+      btn.disabled = true;
+      btn.textContent = "⏳ 正在進入組別...";
+      const sorted = [...seats].sort((a, b) => a - b);
+      const localKey = sorted.join("-");
+      const isInSessionConflict =
+        forceReassign &&
+        $("loginOverlay").classList.contains("hidden") &&
+        state.groupKey === localKey &&
+        (state.localSeq > 0 || countGrid(state.grid).painted > 0 || state.offlineChecks.length > 0 || Boolean(state.title));
+
+      try {
+        const res = await apiCall(
+          {
+            action: "join",
+            seats: sorted,
+            force_reassign: forceReassign,
+          },
+          7000
+        );
+
+        if (res.status === "conflict") {
+          showConflictModal(sorted, res.conflicts || []);
+          renderLoginUI();
+          return;
+        }
+
+        if (res.group) {
+          if (isInSessionConflict) {
+            state.joinedOnCloud = true;
+            state.groupKey = res.group.group_key;
+            state.groupNo = res.group.group_no;
+            state.seats = res.group.seats;
+            state.conflictPrompted = false;
+            state.pendingSync = true;
+            saveLocal();
+            updateGroupHeader();
+            setSyncUI("saving", "⏳ 同步本機作品...");
+            flushSync();
+            return;
+          }
+          // 若同一組別之前在本機還有未上傳的離線紀錄，優先保留並立即補傳
+          const savedLocal = readLocal();
+          const hasLocalPending =
+            savedLocal?.groupKey === res.group.group_key &&
+            (savedLocal.pendingSync || (Array.isArray(savedLocal.offlineChecks) && savedLocal.offlineChecks.length > 0));
+          if (hasLocalPending) {
+            applyJoinedGroup(
+              {
+                group_key: savedLocal.groupKey,
+                group_no: res.group.group_no,
+                seats: res.group.seats,
+                grid: savedLocal.grid || DEFAULT_GRID,
+                title: savedLocal.title || "",
+                is_completed: Boolean(savedLocal.isCompleted),
+                attempts: Number(savedLocal.attempts || res.group.attempts || 0),
+                wrong_attempts: Number(savedLocal.wrongAttempts || res.group.wrong_attempts || 0),
+              },
+              {
+                joinedOnCloud: true,
+                pendingSync: true,
+                offlineChecks: savedLocal.offlineChecks || [],
+                localSeq: savedLocal.localSeq || 1,
+                syncedSeq: savedLocal.syncedSeq || 0,
+                syncMode: "saving",
+                syncText: "⏳ 補傳離線作品...",
+              }
+            );
+            flushSync();
+            return;
+          }
+
+          applyJoinedGroup(res.group, { joinedOnCloud: true });
+        }
+      } catch (err) {
+        if (err.status === 409) {
+          alert(err.message);
+          await refreshLobby();
+          return;
+        }
+        // 離線或連線逾時時的本機可用模式（恢復連線後會自動補建組並更新後台）
+        const parsed = readLocal();
+        const savedLocal = parsed?.groupKey === localKey ? parsed : null;
+        const offlineChecks = Array.isArray(savedLocal?.offlineChecks) ? savedLocal.offlineChecks : [];
+        applyJoinedGroup(
+          {
+            group_key: localKey,
+            group_no: savedLocal?.groupNo || null,
+            seats: sorted,
+            grid: savedLocal?.grid || DEFAULT_GRID,
+            title: savedLocal?.title || "",
+            is_completed: Boolean(savedLocal?.isCompleted),
+            attempts: Number(savedLocal?.attempts || 0),
+            wrong_attempts: Number(savedLocal?.wrongAttempts || 0),
+          },
+          {
+            joinedOnCloud: false,
+            pendingSync: true,
+            offlineChecks,
+            localSeq: Number(savedLocal?.localSeq || 0),
+            syncedSeq: Number(savedLocal?.syncedSeq || 0),
+            syncMode: "err",
+            syncText: offlineChecks.length > 0 ? `📡 離線暫存 (${offlineChecks.length})` : "📡 離線暫存中",
+          }
+        );
+        scheduleRetry(3000);
+      }
+    }
+
+    function openLoginOverlay() {
+      state.pickedSeats = state.seats.length ? [...state.seats] : [];
+      $("loginOverlay").classList.remove("hidden");
+      refreshLobby();
+    }
+
+    $("btnChangeGroup").addEventListener("click", () => {
+      openLoginOverlay();
+    });
+    $("btnRefreshLobby").addEventListener("click", () => {
+      refreshLobby();
+    });
+    $("btnStartGroup").addEventListener("click", () => {
+      if (state.pickedSeats.length === 0) return;
+      joinGroup(state.pickedSeats, false);
+    });
+
+    $("btnConflictCancel").addEventListener("click", () => {
+      $("conflictModal").classList.remove("show");
+      if ($("loginOverlay").classList.contains("hidden")) {
+        openLoginOverlay();
+      }
+    });
+    $("btnConflictRejoin").addEventListener("click", () => {
+      $("conflictModal").classList.remove("show");
+      const c0 = state.pendingConflict?.conflicts?.[0];
+      if (c0) {
+        state.pickedSeats = [...c0.seats];
+        joinGroup(c0.seats, false);
+      }
+    });
+    $("btnConflictReassign").addEventListener("click", () => {
+      $("conflictModal").classList.remove("show");
+      if (state.pendingConflict?.seats) {
+        joinGroup(state.pendingConflict.seats, true);
+      }
+    });
+
+    /* ---- 初始化與斷線／重整無縫還原 ---- */
+    async function boot() {
+      initBoard();
+      renderLoginUI();
+
+      const saved = readLocal();
+      const hasSavedGroup = Boolean(saved?.groupKey && Array.isArray(saved.seats) && saved.seats.length > 0);
+      const hasUnsynced =
+        hasSavedGroup &&
+        (Boolean(saved.pendingSync) ||
+          (Array.isArray(saved.offlineChecks) && saved.offlineChecks.length > 0) ||
+          saved.joinedOnCloud === false);
+
+      // 有尚未同步的離線進度時：優先秒開本機畫布，並在背景立刻補傳，絕不被舊雲端覆蓋
+      if (hasUnsynced) {
+        const offlineChecks = Array.isArray(saved.offlineChecks) ? saved.offlineChecks : [];
+        applyJoinedGroup(
+          {
+            group_key: saved.groupKey,
+            group_no: saved.groupNo || null,
+            seats: saved.seats,
+            grid: saved.grid || DEFAULT_GRID,
+            title: saved.title || "",
+            is_completed: Boolean(saved.isCompleted),
+            attempts: Number(saved.attempts || 0),
+            wrong_attempts: Number(saved.wrongAttempts || 0),
+          },
+          {
+            joinedOnCloud: Boolean(saved.joinedOnCloud),
+            pendingSync: true,
+            offlineChecks,
+            localSeq: Number(saved.localSeq || 1),
+            syncedSeq: Number(saved.syncedSeq || 0),
+            syncMode: navigator.onLine === false ? "err" : "saving",
+            syncText:
+              navigator.onLine === false
+                ? offlineChecks.length > 0
+                  ? `📡 離線暫存 (${offlineChecks.length})`
+                  : "📡 離線暫存中"
+                : "⏳ 恢復同步中...",
+          }
+        );
+        flushSync();
+        return;
+      }
+
+      if (hasSavedGroup) {
+        if (navigator.onLine !== false) {
+          try {
+            const res = await apiCall({ action: "load", group_key: saved.groupKey }, 4500);
+            if (res?.found && res.group) {
+              applyJoinedGroup(res.group, { joinedOnCloud: true });
+              return;
+            }
+            if (res && res.found === false) {
+              localStorage.removeItem(STORAGE_KEY);
+              await refreshLobby();
+              return;
+            }
+          } catch {
+            // 網路異常：改以本機紀錄無縫恢復，讓學生斷線重整也能繼續畫
+          }
+        }
+        applyJoinedGroup(
+          {
+            group_key: saved.groupKey,
+            group_no: saved.groupNo || null,
+            seats: saved.seats,
+            grid: saved.grid || DEFAULT_GRID,
+            title: saved.title || "",
+            is_completed: Boolean(saved.isCompleted),
+            attempts: Number(saved.attempts || 0),
+            wrong_attempts: Number(saved.wrongAttempts || 0),
+          },
+          {
+            joinedOnCloud: Boolean(saved.joinedOnCloud),
+            pendingSync: false,
+            offlineChecks: [],
+            localSeq: Number(saved.localSeq || 0),
+            syncedSeq: Number(saved.syncedSeq || 0),
+            syncMode: "err",
+            syncText: "📡 離線模式（本機已載入）",
+          }
+        );
+        return;
+      }
+
+      await refreshLobby();
+      renderLoginUI();
+    }
+
+    boot();
+  </script>
+</body>
+</html>
